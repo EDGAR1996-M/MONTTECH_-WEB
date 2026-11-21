@@ -282,7 +282,10 @@ body[data-theme="aurora"]{--cyan:#69f0c4;--blue:#4ba9ff;--accent:#a3f7cf}
       };
     });
     if(valueIx<0)throw new Error('Pude leer las filas, pero no encontré una columna numérica. Revisa que haya números (por ejemplo 1250 o 12,5) y vuelve a cargar el archivo.');
-    return result;
+    const validRows=result.filter(r=>Number.isFinite(r.value));
+    validRows.skippedRows=result.length-validRows.length;
+    if(!validRows.length)throw new Error('Encontré las filas, pero ninguna tiene un valor numérico que pueda analizar.');
+    return validRows;
   }
   function render() {
     filtered=selectedRecords();
@@ -357,7 +360,7 @@ body[data-theme="aurora"]{--cyan:#69f0c4;--blue:#4ba9ff;--accent:#a3f7cf}
       byId('category-filter').value='all';byId('table-search').value='';
       render();
       byId('kpi-records-note').textContent='Archivo cargado: '+file.name;
-      byId('stats-note').textContent='Archivo procesado localmente · '+number(imported.length)+' filas importadas.';
+      byId('stats-note').textContent='Archivo procesado localmente · '+number(imported.length)+' filas válidas.'+(imported.skippedRows?' Se omitieron '+number(imported.skippedRows)+' filas sin valor numérico.':'');
     }catch(error){alert('No pude organizar este archivo todavía. '+error.message+'\n\nPuedes probar guardándolo como CSV UTF-8 o revisando que la primera fila tenga los nombres de las columnas.');}
     fileInput.value='';
   });
