@@ -276,4 +276,76 @@
     font-size: 20px;
   }
 }
-```
+
+/* =================================
+   MONTTECH - MEJORAS DE ANIMACIÓN
+================================= */
+
+/* Aparición suave de las secciones */
+.reveal-section {
+    opacity: 0;
+    transform: translateY(35px);
+    transition:
+        opacity 0.8s ease,
+        transform 0.8s ease;
+}
+
+.reveal-section.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Efectos interactivos para tarjetas */
+.service-card,
+.project-card {
+    transition:
+        transform 0.35s ease,
+        box-shadow 0.35s ease,
+        border-color 0.35s ease;
+}
+
+.service-card:hover {
+    transform: translateY(-7px);
+    border-color: var(--cyan);
+    box-shadow: 0 12px 30px rgba(0, 229, 255, 0.15);
+}
+
+/* Mejoras de interacción */
+button,
+.button,
+.nav-links a {
+    transition: all 0.3s ease;
+}
+
+.button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 22px rgba(0, 229, 255, 0.35);
+}
+
+/* Ajustes para móviles */
+@media (max-width: 680px) {
+    .reveal-section {
+        transform: translateY(20px);
+    }
+
+    .service-card,
+    .project-card {
+        transition: transform 0.25s ease;
+    }
+
+    .service-card:hover,
+    .project-card:hover {
+        transform: translateY(-3px);
+    }
+}
+
+/* Accesibilidad: reducir movimiento */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
