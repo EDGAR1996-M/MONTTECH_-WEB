@@ -205,26 +205,84 @@ body[data-theme="aurora"]{--cyan:#69f0c4;--blue:#4ba9ff;--accent:#a3f7cf}
   }
 
   function parseCSV(source) {
+    // Importador flexible: acepta CSV con coma, punto y coma, tabulador o barra vertical.
+    source=String(source||'').replace(/^\uFEFF/,'').replace(/\u0000/g,'');
+    const sample=source.split(/\r?\n/).filter(line=>line.trim()).slice(0,8);
+    if(!sample.length)throw new Error('El archivo está vacío.');
+    const delimiters=[',',';','\t','|'];
+    const delimiter=delimiters.map(d=>({d,n:sample.reduce((s,line)=>s+(line.split(d).length-1),0)})).sort((a,b)=>b.n-a.n)[0].d;
     const rows=[];let row=[],cell='',quoted=false;
     for(let i=0;i<source.length;i++){
       const ch=source[i],next=source[i+1];
       if(ch==='"'&&quoted&&next==='"'){cell+='"';i++;}
       else if(ch==='"')quoted=!quoted;
-      else if((ch===','||ch===';'||ch==='\t')&&!quoted){row.push(cell.trim());cell='';}
+      else if(ch===delimiter&&!quoted){row.push(cell.trim());cell='';}
       else if((ch==='\n'||ch==='\r')&&!quoted){if(ch==='\r'&&next==='\n')i++;row.push(cell.trim());if(row.some(v=>v!==''))rows.push(row);row=[];cell='';}
       else cell+=ch;
     }
     row.push(cell.trim());if(row.some(v=>v!==''))rows.push(row);
-    if(quoted)throw new Error('El CSV contiene comillas sin cerrar.');
-    if(rows.length<2)throw new Error('El archivo debe incluir encabezados y al menos un registro.');
-    const norm=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
-    const headers=rows[0].map(norm),find=names=>headers.findIndex(h=>names.includes(h));
-    const ix={date:find(['fecha','date']),category:find(['categoria','category']),description:find(['descripcion','description','detalle']),value:find(['valor','value','monto','amount']),status:find(['estado','status']),treatment:find(['tratamiento','treatment','sustrato']),variable:find(['variable','indicador','measurement']),unit:find(['unidad','unit']),crop:find(['cultivo','crop']),variety:find(['variedad','variety']),replicate:find(['repeticion','replica','replicate'])};
-    if(ix.date<0||ix.value<0||(ix.category<0&&ix.treatment<0))throw new Error('Se requieren Fecha, Valor y Categoria o Tratamiento. Para AgroData agrega Variable, Unidad, Cultivo y Variedad si aplica.');
-    if(ix.category<0)ix.category=ix.treatment;
-    const dateOf=s=>{let m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);if(m)return new Date(+m[1],+m[2]-1,+m[3]);m=s.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/);if(m)return new Date(+m[3],+m[2]-1,+m[1]);return new Date(s);};
-    const numOf=s=>{let v=String(s).replace(/[^\d,.-]/g,'');if(v.includes(',')&&v.includes('.'))v=v.lastIndexOf(',')>v.lastIndexOf('.')?v.replace(/\./g,'').replace(',','.'):v.replace(/,/g,'');else if(v.includes(','))v=v.replace(',','.');return Number(v);};
-    return rows.slice(1).map((r,i)=>{const date=dateOf(r[ix.date]||''),value=numOf(r[ix.value]||'');if(!Number.isFinite(date.getTime())||!Number.isFinite(value))throw new Error('Fecha o valor no válido en fila '+(i+2)+'.');const treatment=ix.treatment>=0?(r[ix.treatment]||r[ix.category]||''):(r[ix.category]||'');const variable=ix.variable>=0?(r[ix.variable]||'') : '';return {date:new Date(date.getFullYear(),date.getMonth(),date.getDate()),category:r[ix.category]||treatment||'Sin categoría',description:ix.description>=0?(r[ix.description]||variable||'Registro importado'):(variable||'Registro importado'),value,status:ix.status>=0?(r[ix.status]||'Importado'):'Importado',treatment,variable,unit:ix.unit>=0?(r[ix.unit]||''):'',crop:ix.crop>=0?(r[ix.crop]||''):'',variety:ix.variety>=0?(r[ix.variety]||''):'',replicate:ix.replicate>=0?(r[ix.replicate]||''):'',};});
+    if(quoted)throw new Error('Hay comillas sin cerrar. Abre el archivo y revisa la fila indicada.');
+    if(rows.length<2)throw new Error('No encuentro una tabla con encabezados y filas de datos.');
+    const width=Math.max(...rows.map(r=>r.length));
+    const norm=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
+    const headers=rows[0].map((h,i)=>norm(h)||('columna'+(i+1)));
+    const data=rows.slice(1).filter(r=>r.some(v=>String(v||'').trim())).map(r=>Array.from({length:width},(_,i)=>(r[i]||'').trim()));
+    if(!data.length)throw new Error('La tabla tiene encabezados, pero no contiene filas con información.');
+    const find=aliases=>headers.findIndex(h=>aliases.some(a=>h===a||h.includes(a)));
+    const parseNumber=s=>{
+      let v=String(s??'').trim().replace(/[^\d,.-]/g,'');
+      if(!v||v==='-'||v==='.')return NaN;
+      if(v.includes(',')&&v.includes('.'))v=v.lastIndexOf(',')>v.lastIndexOf('.')?v.replace(/\./g,'').replace(',','.'):v.replace(/,/g,'');
+      else if(v.includes(',')){const parts=v.split(',');v=parts.length===2&&parts[1].length<=2?parts[0]+'.'+parts[1]:parts.join('');}
+      else if((v.match(/\./g)||[]).length>1)v=v.replace(/\./g,'');
+      return Number(v);
+    };
+    const parseDate=s=>{
+      const v=String(s||'').trim();
+      let m=v.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/);
+      if(m)return new Date(+m[1],+m[2]-1,+m[3]);
+      m=v.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})/);
+      if(m)return new Date(+m[3],+m[2]-1,+m[1]);
+      const d=new Date(v);return d;
+    };
+    let dateIx=find(['fecha','date','dia','timestamp','createdat']);
+    if(dateIx<0)dateIx=headers.findIndex((_,i)=>data.filter(r=>Number.isFinite(parseDate(r[i]).getTime())).length>=Math.max(2,Math.ceil(data.length*.65)));
+    let valueIx=find(['valor','value','monto','amount','total','precio','price','cantidad','quantity','medicion','measurement','resultado','result']);
+    if(valueIx<0)valueIx=headers.findIndex((_,i)=>data.filter(r=>Number.isFinite(parseNumber(r[i]))).length>=Math.max(2,Math.ceil(data.length*.6)));
+    const categoryIx=find(['categoria','category','grupo','group','tipo','type','tratamiento','treatment','sustrato','variedad','variety','cultivo','crop']);
+    const descriptionIx=find(['descripcion','description','detalle','detail','nombre','name','producto','product','concepto']);
+    const treatmentIx=find(['tratamiento','treatment','sustrato']);
+    const variableIx=find(['variable','indicador','measurement','parametro','parameter']);
+    const unitIx=find(['unidad','unit']);
+    const cropIx=find(['cultivo','crop']);
+    const varietyIx=find(['variedad','variety']);
+    const replicateIx=find(['repeticion','replica','replicate','muestra','sample']);
+    const statusIx=find(['estado','status']);
+    const ignored=new Set([dateIx,valueIx,categoryIx,descriptionIx,statusIx,treatmentIx,variableIx,unitIx,cropIx,varietyIx,replicateIx].filter(i=>i>=0));
+    const otherText=headers.map((_,i)=>i).filter(i=>!ignored.has(i));
+    const fallbackDate=new Date();
+    const result=data.map((r,i)=>{
+      const parsedDate=dateIx>=0?parseDate(r[dateIx]):fallbackDate;
+      const validDate=Number.isFinite(parsedDate.getTime())?parsedDate:fallbackDate;
+      const parsedValue=valueIx>=0?parseNumber(r[valueIx]):NaN;
+      const treatment=treatmentIx>=0?r[treatmentIx]:(categoryIx>=0?r[categoryIx]:'');
+      const category=categoryIx>=0?r[categoryIx]:(treatment||'Datos');
+      const description=descriptionIx>=0?r[descriptionIx]:otherText.map(ix=>headers[ix]+': '+r[ix]).filter(x=>!x.endsWith(': ')).join(' · ')||('Registro '+(i+1));
+      return {
+        date:new Date(validDate.getFullYear(),validDate.getMonth(),validDate.getDate()),
+        category:category||'Sin categoría',
+        description:description||('Registro '+(i+1)),
+        value:Number.isFinite(parsedValue)?parsedValue:0,
+        status:statusIx>=0?(r[statusIx]||'Importado'):'Importado',
+        treatment,variable:variableIx>=0?r[variableIx]:'',
+        unit:unitIx>=0?r[unitIx]:'',crop:cropIx>=0?r[cropIx]:'',
+        variety:varietyIx>=0?r[varietyIx]:'',
+        replicate:replicateIx>=0?r[replicateIx]:'',
+        _source:r
+      };
+    });
+    if(valueIx<0)throw new Error('Pude leer las filas, pero no encontré una columna numérica. Revisa que haya números (por ejemplo 1250 o 12,5) y vuelve a cargar el archivo.');
+    return result;
   }
   function render() {
     filtered=selectedRecords();
@@ -276,7 +334,7 @@ body[data-theme="aurora"]{--cyan:#69f0c4;--blue:#4ba9ff;--accent:#a3f7cf}
   const fileInput=byId('csv-file');
   if(fileInput) fileInput.addEventListener('change',async()=>{
     const file=fileInput.files&&fileInput.files[0];if(!file)return;
-    if(file.size>5*1024*1024){alert('El archivo supera el límite de 5 MB.');fileInput.value='';return;}
+    if(file.size>20*1024*1024){alert('El archivo supera el límite de 20 MB. Prueba con una copia más pequeña.');fileInput.value='';return;}
     try{
       let imported;
       const extension=file.name.split('.').pop().toLowerCase();
@@ -300,7 +358,7 @@ body[data-theme="aurora"]{--cyan:#69f0c4;--blue:#4ba9ff;--accent:#a3f7cf}
       render();
       byId('kpi-records-note').textContent='Archivo cargado: '+file.name;
       byId('stats-note').textContent='Archivo procesado localmente · '+number(imported.length)+' filas importadas.';
-    }catch(error){alert('No se pudo importar el CSV: '+error.message);}
+    }catch(error){alert('No pude organizar este archivo todavía. '+error.message+'\n\nPuedes probar guardándolo como CSV UTF-8 o revisando que la primera fila tenga los nombres de las columnas.');}
     fileInput.value='';
   });
   const themePicker=byId('dashboard-theme'),allowedThemes=['aurora','ocean','lavender','sunrise'];
