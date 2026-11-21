@@ -23,7 +23,7 @@ body[data-theme="lavender"]{--cyan:#c1a7ff;--blue:#7b79ff;--accent:#e0b8ff}
 body[data-theme="sunrise"]{--cyan:#ffd18a;--blue:#ff9c9c;--accent:#ffb6a0}
 body[data-theme="aurora"]{--cyan:#69f0c4;--blue:#4ba9ff;--accent:#a3f7cf}
 .theme-label{color:var(--muted);font-size:10px}
-.import-label{display:inline-flex;align-items:center;padding:9px 12px;border:1px solid var(--cyan);border-radius:9px;color:var(--cyan);background:rgba(0,190,255,.1);font-size:10px;cursor:pointer;white-space:nowrap}
+#import-workbench[hidden]{display:none!important}.import-label{display:inline-flex;align-items:center;padding:9px 12px;border:1px solid var(--cyan);border-radius:9px;color:var(--cyan);background:rgba(0,190,255,.1);font-size:10px;cursor:pointer;white-space:nowrap}
 .import-label:hover{background:rgba(0,190,255,.2)}
 .stats-panel{margin-bottom:16px}
 .agro-panel{margin-bottom:18px}
@@ -77,7 +77,7 @@ body[data-theme="aurora"]{--cyan:#69f0c4;--blue:#4ba9ff;--accent:#a3f7cf}
 <article class="panel"><div class="panel-head"><div><h2>Evolución diaria</h2><p class="panel-sub">Volumen de registros por fecha</p></div><div class="legend"><span>Registros</span></div></div><div class="chart-wrap"><canvas id="trend-chart" role="img" aria-label="Gráfico de línea de registros diarios"></canvas><div class="chart-tooltip" id="trend-tooltip"></div></div></article>
 <article class="panel"><div class="panel-head"><div><h2>Distribución por categoría</h2><p class="panel-sub">Participación dentro de la selección</p></div></div><div class="donut-area"><div class="donut" id="donut-chart" role="img" aria-label="Gráfico circular de categorías"><div class="donut-center"><strong id="donut-total">0</strong><small>registros</small></div></div><div class="legend-list" id="category-legend"></div></div></article>
 </section>
-<section class="panel table-panel"><div class="panel-head"><div><h2>Registros recientes</h2><p class="panel-sub">Consulta y filtra los datos de demostración</p></div><div class="table-tools"><label class="import-label" for="csv-file">Cargar CSV / Excel</label><input id="csv-file" type="file" accept=".csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" hidden><input class="search" id="table-search" type="search" placeholder="Buscar categoría o fecha..." aria-label="Buscar en registros"><button class="export" id="template-csv" type="button">Plantilla general ↓</button><button class="export" id="template-agro" type="button">Plantilla AgroData ↓</button><button class="export" id="export-csv" type="button">Exportar CSV ↓</button><button class="export" id="export-pdf" type="button">Informe PDF ↗</button></div></div><div class="table-scroll"><table><thead><tr><th>Fecha</th><th>Categoría</th><th>Descripción</th><th>Valor</th><th>Estado</th></tr></thead><tbody id="data-table"></tbody></table></div><p class="panel-sub" id="table-count" aria-live="polite"></p></section>
+<section class="panel" id="import-workbench" hidden style="margin-bottom:16px"><div class="panel-head"><div><div class="eyebrow">IMPORTACIÓN INTELIGENTE</div><h2>Revisa y organiza tu archivo</h2><p class="panel-sub" id="import-file-note">Selecciona qué columna corresponde a cada dato. No necesitas cambiar tu Excel.</p></div></div><div class="stats-grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))"><label class="panel-sub">Columna de valores *<select class="select" id="map-value" style="display:block;width:100%;margin-top:7px"></select></label><label class="panel-sub">Fecha (opcional)<select class="select" id="map-date" style="display:block;width:100%;margin-top:7px"></select></label><label class="panel-sub">Categoría / grupo<select class="select" id="map-category" style="display:block;width:100%;margin-top:7px"></select></label><label class="panel-sub">Descripción<select class="select" id="map-description" style="display:block;width:100%;margin-top:7px"></select></label></div><p class="panel-sub" id="import-preview-note" aria-live="polite" style="margin:14px 0 8px"></p><div class="table-scroll"><table><thead><tr id="import-preview-head"></tr></thead><tbody id="import-preview-body"></tbody></table></div><div class="filters" style="margin-top:14px"><button class="export" id="import-confirm" type="button">Usar estos datos</button><button class="filter-btn" id="import-cancel" type="button">Cancelar</button></div></section><section class="panel table-panel"><div class="panel-head"><div><h2>Registros recientes</h2><p class="panel-sub">Consulta y filtra los datos de demostración</p></div><div class="table-tools"><label class="import-label" for="csv-file">Cargar CSV / Excel</label><input id="csv-file" type="file" accept=".csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" hidden><input class="search" id="table-search" type="search" placeholder="Buscar categoría o fecha..." aria-label="Buscar en registros"><button class="export" id="template-csv" type="button">Plantilla general ↓</button><button class="export" id="template-agro" type="button">Plantilla AgroData ↓</button><button class="export" id="export-csv" type="button">Exportar CSV ↓</button><button class="export" id="export-pdf" type="button">Informe PDF ↗</button></div></div><div class="table-scroll"><table><thead><tr><th>Fecha</th><th>Categoría</th><th>Descripción</th><th>Valor</th><th>Estado</th></tr></thead><tbody id="data-table"></tbody></table></div><p class="panel-sub" id="table-count" aria-live="polite"></p></section>
 <section class="panel stats-panel"><div class="panel-head"><div><h2>Resumen estadístico</h2><p class="panel-sub">Calculado sobre los valores numéricos del conjunto filtrado</p></div></div><div class="stats-grid"><article><span>Media</span><strong id="stat-mean">—</strong></article><article><span>Mediana</span><strong id="stat-median">—</strong></article><article><span>Desviación estándar</span><strong id="stat-sd">—</strong></article><article><span>Varianza muestral</span><strong id="stat-variance">—</strong></article><article><span>Coeficiente de variación</span><strong id="stat-cv">—</strong></article></div><p class="panel-sub" id="stats-note">Estadísticos calculados con los datos visibles del período.</p></section>
 <section class="panel agro-panel" aria-labelledby="agro-title">
 <div class="panel-head"><div><div class="eyebrow">MONTTECH · AGRODATA</div><h2 id="agro-title">Comparación de tratamientos agrícolas</h2><p class="panel-sub">Compara mediciones reales agrupadas por variable y tratamiento.</p></div><select class="select" id="agro-variable" aria-label="Seleccionar variable agrícola"><option value="all">Todas las variables</option></select></div>
@@ -334,36 +334,63 @@ body[data-theme="aurora"]{--cyan:#69f0c4;--blue:#4ba9ff;--accent:#a3f7cf}
   if('ResizeObserver'in window)new ResizeObserver(()=>drawLine(filtered)).observe(canvas);
   else window.addEventListener('resize',()=>drawLine(filtered));
 
+  let pendingImport=null;
+  const workbench=byId('import-workbench');
+  const normalizeHeader=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
+  const aliases={value:['valor','value','monto','amount','total','precio','price','cantidad','quantity','medicion','measurement','resultado','result','altura','diametro','brotes','peso','longitud'],date:['fecha','date','dia','timestamp'],category:['categoria','category','grupo','group','tipo','type','tratamiento','treatment','sustrato','variedad','cultivo'],description:['descripcion','description','detalle','detail','nombre','name','producto','product','concepto','variable']};
+  function looseNumber(s){let v=String(s??'').trim().replace(/[^\d,.-]/g,'');if(!v||v==='-'||v==='.')return NaN;if(v.includes(',')&&v.includes('.'))v=v.lastIndexOf(',')>v.lastIndexOf('.')?v.replace(/\./g,'').replace(',','.'):v.replace(/,/g,'');else if(v.includes(',')){const p=v.split(',');v=p.length===2&&p[1].length<=2?p[0]+'.'+p[1]:p.join('');}else if((v.match(/\./g)||[]).length>1)v=v.replace(/\./g,'');return Number(v);}
+  function fillMap(id,headers,selected){const el=byId(id);el.innerHTML='<option value="-1">No usar</option>'+headers.map((h,i)=>'<option value="'+i+'">'+escapeHTML(h)+'</option>').join('');el.value=String(selected);}
+  function showPreview(file){
+    const h=pendingImport.headers,ix=pendingImport.indexes;
+    byId('import-file-note').textContent=file.name+' · '+pendingImport.rows.length+' filas detectadas. Revisa las columnas antes de importar.';
+    fillMap('map-value',h,ix.value);fillMap('map-date',h,ix.date);fillMap('map-category',h,ix.category);fillMap('map-description',h,ix.description);
+    byId('import-preview-head').innerHTML=h.map(x=>'<th>'+escapeHTML(x)+'</th>').join('');
+    byId('import-preview-body').innerHTML=pendingImport.rows.slice(0,5).map(row=>'<tr>'+h.map((_,i)=>'<td>'+escapeHTML(row[i]||'')+'</td>').join('')+'</tr>').join('');
+    byId('import-preview-note').textContent='Vista previa de las primeras '+Math.min(5,pendingImport.rows.length)+' filas. Puedes cambiar la columna de valores si DataLab no la detectó bien.';
+    workbench.hidden=false;workbench.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  function confirmImport(){
+    if(!pendingImport)return;
+    const vi=Number(byId('map-value').value),di=Number(byId('map-date').value),ci=Number(byId('map-category').value),xi=Number(byId('map-description').value);
+    if(vi<0){alert('Selecciona la columna que contiene los números que deseas analizar.');return;}
+    const toDate=s=>{let v=String(s||'').trim(),m=v.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/);if(m)return new Date(+m[1],+m[2]-1,+m[3]);m=v.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})/);if(m)return new Date(+m[3],+m[2]-1,+m[1]);return new Date(v);};
+    const imported=pendingImport.rows.map((row,i)=>{const d=di>=0?toDate(row[di]):new Date();return {date:Number.isFinite(d.getTime())?d:new Date(),category:ci>=0?(row[ci]||'Sin categoría'):'Todos los datos',description:xi>=0?(row[xi]||'Registro '+(i+1)):'Registro '+(i+1),value:looseNumber(row[vi]),status:'Importado',treatment:ci>=0?row[ci]:'',variable:xi>=0?row[xi]:'',_source:row};}).filter(x=>Number.isFinite(x.value));
+    if(!imported.length){alert('No encontré números válidos en esa columna. Selecciona otra columna.');return;}
+    const skipped=pendingImport.rows.length-imported.length,fileName=pendingImport.fileName;
+    records.splice(0,records.length,...imported);categories=[...new Set(imported.map(x=>x.category))];
+    today.setTime(Math.max(...imported.map(x=>x.date.getTime())));days=0;category='all';search='';
+    document.querySelectorAll('[data-range]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.range==='all')));
+    byId('category-filter').value='all';byId('table-search').value='';render();
+    byId('kpi-records-note').textContent='Archivo cargado: '+fileName;
+    byId('stats-note').textContent=number(imported.length)+' filas listas para analizar.'+(skipped?' Se omitieron '+number(skipped)+' filas sin número válido.':'');
+    byId('table-count').textContent=number(imported.length)+' registros importados correctamente.';
+    workbench.hidden=true;pendingImport=null;
+  }
   const fileInput=byId('csv-file');
-  if(fileInput) fileInput.addEventListener('change',async()=>{
+  if(fileInput)fileInput.addEventListener('change',async()=>{
     const file=fileInput.files&&fileInput.files[0];if(!file)return;
-    if(file.size>20*1024*1024){alert('El archivo supera el límite de 20 MB. Prueba con una copia más pequeña.');fileInput.value='';return;}
+    if(file.size>20*1024*1024){alert('El archivo supera 20 MB. Prueba con una copia más pequeña.');fileInput.value='';return;}
     try{
-      let imported;
-      const extension=file.name.split('.').pop().toLowerCase();
-      if(extension==='xlsx'||extension==='xls'){
-        if(!window.XLSX)throw new Error('No se pudo cargar el lector de Excel. Revisa tu conexión e inténtalo de nuevo.');
-        const workbook=window.XLSX.read(await file.arrayBuffer(),{type:'array',cellDates:true});
-        const firstSheet=workbook.Sheets[workbook.SheetNames[0]];
-        if(!firstSheet)throw new Error('El libro de Excel no contiene hojas.');
-        imported=parseCSV(window.XLSX.utils.sheet_to_csv(firstSheet));
-      }else{
-        imported=parseCSV(await file.text());
-      }
-      if(!imported.length)throw new Error('El archivo no contiene registros.');
-      records.splice(0,records.length,...imported);
-      categories=[...new Set(imported.map(r=>r.category).filter(Boolean))];
-      if(!categories.length)categories=['Sin categoría'];
-      const latest=new Date(Math.max(...imported.map(r=>r.date.getTime())));
-      today.setTime(latest.getTime());days=0;category='all';search='';
-      document.querySelectorAll('[data-range]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.range==='all')));
-      byId('category-filter').value='all';byId('table-search').value='';
-      render();
-      byId('kpi-records-note').textContent='Archivo cargado: '+file.name;
-      byId('stats-note').textContent='Archivo procesado localmente · '+number(imported.length)+' filas válidas.'+(imported.skippedRows?' Se omitieron '+number(imported.skippedRows)+' filas sin valor numérico.':'');
-    }catch(error){alert('No pude organizar este archivo todavía. '+error.message+'\n\nPuedes probar guardándolo como CSV UTF-8 o revisando que la primera fila tenga los nombres de las columnas.');}
+      let matrix;const ext=file.name.split('.').pop().toLowerCase();
+      if(ext==='xlsx'||ext==='xls'){
+        if(!window.XLSX)throw new Error('No se pudo cargar el lector Excel. Revisa tu conexión.');
+        const wb=window.XLSX.read(await file.arrayBuffer(),{type:'array',cellDates:true}),sheet=wb.Sheets[wb.SheetNames[0]];
+        if(!sheet)throw new Error('El libro no contiene hojas.');matrix=window.XLSX.utils.sheet_to_json(sheet,{header:1,defval:'',raw:false});
+      }else{const parsed=parseCSV(await file.text());matrix=[parsed.headers,...parsed.rawRows];}
+      if(!matrix||matrix.length<2)throw new Error('No encuentro filas de datos.');
+      const headers=matrix[0].map((h,i)=>String(h||'Columna '+(i+1))),rows=matrix.slice(1).filter(row=>row.some(v=>String(v??'').trim()!=='')).map(row=>headers.map((_,i)=>String(row[i]??'').trim()));
+      if(!rows.length)throw new Error('El archivo tiene encabezados, pero no contiene registros.');
+      const norm=headers.map(normalizeHeader),detect=kind=>headers.findIndex((_,i)=>aliases[kind].some(a=>norm[i].includes(a)));
+      let value=detect('value');if(value<0)value=headers.findIndex((_,i)=>rows.filter(row=>Number.isFinite(looseNumber(row[i]))).length>=Math.max(1,Math.ceil(rows.length*.5)));
+      pendingImport={headers,rows,fileName:file.name,indexes:{value,date:detect('date'),category:detect('category'),description:detect('description')}};
+      showPreview(file);
+      if(value<0)byId('import-preview-note').textContent='No detecté automáticamente los números. Selecciona manualmente la columna de valores.';
+      else byId('map-value').value=String(value);
+    }catch(err){alert('No pude leer el archivo. '+err.message+' Prueba con CSV UTF-8 o selecciona otra hoja de Excel.');}
     fileInput.value='';
   });
+  byId('import-confirm').addEventListener('click',confirmImport);
+  byId('import-cancel').addEventListener('click',()=>{pendingImport=null;workbench.hidden=true;});
   const themePicker=byId('dashboard-theme'),allowedThemes=['aurora','ocean','lavender','sunrise'];
   let theme='aurora';try{theme=localStorage.getItem('monttech-theme')||'aurora';}catch(_){}
   if(!allowedThemes.includes(theme))theme='aurora';
