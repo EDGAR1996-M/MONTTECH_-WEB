@@ -196,3 +196,40 @@ if ('IntersectionObserver' in window && navigationLinks.length && observedSectio
 
   observedSections.forEach(section => navigationObserver.observe(section));
 }
+
+/* =========================================
+   FORMULARIO DE CONTACTO A WHATSAPP
+========================================= */
+const whatsappForm = document.getElementById('whatsapp-form');
+
+if (whatsappForm) {
+  whatsappForm.addEventListener('submit', event => {
+    event.preventDefault();
+
+    if (!whatsappForm.reportValidity()) return;
+
+    const formData = new FormData(whatsappForm);
+    const name = String(formData.get('name') || '').trim();
+    const email = String(formData.get('email') || '').trim();
+    const service = String(formData.get('service') || '').trim();
+    const message = String(formData.get('message') || '').trim();
+
+    const whatsappMessage = [
+      'Hola, MONTTECH. Quisiera recibir información sobre un proyecto.',
+      '',
+      'Nombre: ' + name,
+      email ? 'Correo: ' + email : '',
+      'Servicio: ' + service,
+      'Descripción: ' + message
+    ].filter(Boolean).join('\n');
+
+    const whatsappUrl = 'https://wa.me/573137250239?text=' + encodeURIComponent(whatsappMessage);
+    const feedback = document.getElementById('form-feedback');
+
+    if (feedback) {
+      feedback.textContent = 'Se abrirá WhatsApp en una nueva pestaña. Revisa el mensaje antes de enviarlo.';
+    }
+
+    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+  });
+}
