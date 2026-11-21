@@ -138,19 +138,19 @@ body[data-theme="aurora"]{--cyan:#69f0c4;--blue:#4ba9ff;--accent:#a3f7cf}
       const ch=source[i],next=source[i+1];
       if(ch==='"'&&quoted&&next==='"'){cell+='"';i++;}
       else if(ch==='"')quoted=!quoted;
-      else if((ch===','||ch===';'||ch==='\\t')&&!quoted){row.push(cell.trim());cell='';}
-      else if((ch==='\\n'||ch==='\\r')&&!quoted){if(ch==='\\r'&&next==='\\n')i++;row.push(cell.trim());if(row.some(v=>v!==''))rows.push(row);row=[];cell='';}
+      else if((ch===','||ch===';'||ch==='\t')&&!quoted){row.push(cell.trim());cell='';}
+      else if((ch==='\n'||ch==='\r')&&!quoted){if(ch==='\r'&&next==='\n')i++;row.push(cell.trim());if(row.some(v=>v!==''))rows.push(row);row=[];cell='';}
       else cell+=ch;
     }
     row.push(cell.trim());if(row.some(v=>v!==''))rows.push(row);
     if(quoted)throw new Error('El CSV contiene comillas sin cerrar.');
     if(rows.length<2)throw new Error('El archivo debe incluir encabezados y al menos un registro.');
-    const norm=s=>s.normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
+    const norm=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
     const headers=rows[0].map(norm),find=names=>headers.findIndex(h=>names.includes(h));
     const ix={date:find(['fecha','date']),category:find(['categoria','category']),description:find(['descripcion','description','detalle']),value:find(['valor','value','monto','amount']),status:find(['estado','status'])};
     if(ix.date<0||ix.category<0||ix.value<0)throw new Error('Se requieren columnas Fecha, Categoria y Valor. Descripcion y Estado son opcionales.');
-    const dateOf=s=>{let m=s.match(/^(\\d{4})-(\\d{1,2})-(\\d{1,2})$/);if(m)return new Date(+m[1],+m[2]-1,+m[3]);m=s.match(/^(\\d{1,2})[\\/.-](\\d{1,2})[\\/.-](\\d{4})$/);if(m)return new Date(+m[3],+m[2]-1,+m[1]);return new Date(s);};
-    const numOf=s=>{let v=String(s).replace(/[^\\d,.-]/g,'');if(v.includes(',')&&v.includes('.'))v=v.lastIndexOf(',')>v.lastIndexOf('.')?v.replace(/\\./g,'').replace(',','.'):v.replace(/,/g,'');else if(v.includes(','))v=v.replace(',','.');return Number(v);};
+    const dateOf=s=>{let m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);if(m)return new Date(+m[1],+m[2]-1,+m[3]);m=s.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/);if(m)return new Date(+m[3],+m[2]-1,+m[1]);return new Date(s);};
+    const numOf=s=>{let v=String(s).replace(/[^\d,.-]/g,'');if(v.includes(',')&&v.includes('.'))v=v.lastIndexOf(',')>v.lastIndexOf('.')?v.replace(/\./g,'').replace(',','.'):v.replace(/,/g,'');else if(v.includes(','))v=v.replace(',','.');return Number(v);};
     return rows.slice(1).map((r,i)=>{const date=dateOf(r[ix.date]||''),value=numOf(r[ix.value]||'');if(!Number.isFinite(date.getTime())||!Number.isFinite(value))throw new Error('Fecha o valor no válido en fila '+(i+2)+'.');return {date:new Date(date.getFullYear(),date.getMonth(),date.getDate()),category:r[ix.category]||'Sin categoría',description:ix.description>=0?(r[ix.description]||'Registro importado'):'Registro importado',value,status:ix.status>=0?(r[ix.status]||'Importado'):'Importado'};});
   }
 \n  function render() {
