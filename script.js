@@ -301,3 +301,19 @@ if (projectDialog) {
   const dialogContact = document.getElementById('project-dialog-contact');
   if (dialogContact) dialogContact.addEventListener('click', () => projectDialog.close());
 }
+
+/* Ambientes visuales persistentes */
+(() => {
+ const picker=document.getElementById('site-theme');
+ if(!picker)return;
+ const allowed=['aurora','ocean','lavender','sunrise'];
+ let saved='aurora';
+ try{saved=localStorage.getItem('monttech-theme')||'aurora';}catch(_){}
+ if(!allowed.includes(saved))saved='aurora';
+ document.body.dataset.theme=saved;picker.value=saved;
+ picker.addEventListener('change',()=>{
+  const theme=allowed.includes(picker.value)?picker.value:'aurora';
+  document.body.dataset.theme=theme;
+  try{localStorage.setItem('monttech-theme',theme);}catch(_){}
+ });
+})();
