@@ -133,6 +133,7 @@
           Diseño y desarrollo de sitios web modernos,
           adaptables y funcionales.
         </p>
+        <button class="project-detail-btn" type="button" data-open-project="web" aria-haspopup="dialog">Explorar proyecto <span>↗</span></button>
         <span class="project-status">Proyecto demostrativo</span>
       </div>
     </article>
@@ -150,6 +151,7 @@
           Análisis estadístico, visualización de datos
           y tableros para apoyar decisiones.
         </p>
+        <button class="project-detail-btn" type="button" data-open-project="data" aria-haspopup="dialog">Explorar proyecto <span>↗</span></button>
         <span class="project-status">Proyecto demostrativo</span>
       </div>
     </article>
@@ -167,6 +169,7 @@
           Desarrollo de aplicaciones y sistemas
           enfocados en necesidades específicas.
         </p>
+        <button class="project-detail-btn" type="button" data-open-project="apps" aria-haspopup="dialog">Explorar proyecto <span>↗</span></button>
         <span class="project-status">Proyecto demostrativo</span>
       </div>
     </article>
@@ -184,6 +187,7 @@
           Optimización de tareas y procesos
           mediante herramientas tecnológicas.
         </p>
+        <button class="project-detail-btn" type="button" data-open-project="automation" aria-haspopup="dialog">Explorar proyecto <span>↗</span></button>
         <span class="project-status">Proyecto demostrativo</span>
       </div>
     </article>
@@ -199,6 +203,20 @@
   </div>
 
 </section>
+
+    <dialog class="project-dialog" id="project-dialog" aria-labelledby="project-dialog-title">
+      <div class="project-dialog-inner">
+        <button class="dialog-close" type="button" data-close-project aria-label="Cerrar ventana">×</button>
+        <div class="eyebrow" id="project-dialog-category">PROYECTO MONTTECH</div>
+        <h2 id="project-dialog-title">Proyecto</h2>
+        <p id="project-dialog-description"></p>
+        <div class="dialog-detail-block"><strong>Enfoque de solución</strong><p id="project-dialog-outcome"></p></div>
+        <div class="dialog-detail-block"><strong>Tecnologías / herramientas</strong><p id="project-dialog-tech"></p></div>
+        <p class="dialog-disclaimer">Portafolio demostrativo: esta ficha describe una propuesta de solución, no un producto publicado ni un caso de cliente.</p>
+        <a class="button" href="#contacto" id="project-dialog-contact">Quiero una solución similar <span>↗</span></a>
+      </div>
+    </dialog>
+
     <section class="testimonial section-wrap" id="testimonios">
       <div class="quote-mark">“</div><p>La tecnología adecuada convierte los desafíos en oportunidades.</p><span>MONTTECH · Tecnología y soluciones inteligentes</span>
     </section>
