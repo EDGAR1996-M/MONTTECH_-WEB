@@ -183,6 +183,33 @@ body[data-theme="aurora"]{--cyan:#69f0c4;--blue:#4ba9ff;--accent:#a3f7cf}
   canvas.addEventListener('mouseleave',()=>tooltip.style.display='none');
   if('ResizeObserver'in window)new ResizeObserver(()=>drawLine(filtered)).observe(canvas);
   else window.addEventListener('resize',()=>drawLine(filtered));
+
+  const fileInput=byId('csv-file');
+  if(fileInput) fileInput.addEventListener('change',async()=>{
+    const file=fileInput.files&&fileInput.files[0];if(!file)return;
+    if(file.size>5*1024*1024){alert('El archivo supera el límite de 5 MB.');fileInput.value='';return;}
+    try{
+      const imported=parseCSV(await file.text());
+      if(!imported.length)throw new Error('El archivo no contiene registros.');
+      records.splice(0,records.length,...imported);
+      const latest=new Date(Math.max(...imported.map(r=>r.date.getTime())));
+      today.setTime(latest.getTime());days=90;category='all';search='';
+      document.querySelectorAll('[data-range]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.range)===90)));
+      byId('category-filter').value='all';byId('table-search').value='';
+      render();
+      byId('kpi-records-note').textContent='Archivo cargado: '+file.name;
+      byId('stats-note').textContent='Archivo procesado localmente · '+number(imported.length)+' filas importadas.';
+    }catch(error){alert('No se pudo importar el CSV: '+error.message);}
+    fileInput.value='';
+  });
+  const themePicker=byId('dashboard-theme'),allowedThemes=['aurora','ocean','lavender','sunrise'];
+  let theme='aurora';try{theme=localStorage.getItem('monttech-theme')||'aurora';}catch(_){}
+  if(!allowedThemes.includes(theme))theme='aurora';
+  document.body.dataset.theme=theme;
+  if(themePicker){themePicker.value=theme;themePicker.addEventListener('change',()=>{
+    const value=allowedThemes.includes(themePicker.value)?themePicker.value:'aurora';
+    document.body.dataset.theme=value;try{localStorage.setItem('monttech-theme',value);}catch(_){}
+  });}
   render();
 })();
 </script>
