@@ -27,7 +27,7 @@
     <nav class="nav-links" id="primary-navigation" aria-label="Navegación principal">
       <a class="active" href="#inicio">Inicio</a><a href="#servicios">Servicios</a>
       <a href="#nosotros">Sobre Nosotros</a><a href="#tecnologias">Tecnologías</a><a href="#proyectos">Proyectos</a>
-      <a href="#testimonios">Testimonios</a><a href="#contacto">Contacto</a>
+      <a href="#preguntas">Preguntas</a><a href="#testimonios">Testimonios</a><a href="#contacto">Contacto</a>
     </nav>
     <a class="button button-small" href="#contacto">↗ <span>Contáctanos</span></a>
   </header>
@@ -203,9 +203,64 @@
       <div class="quote-mark">“</div><p>La tecnología adecuada convierte los desafíos en oportunidades.</p><span>MONTTECH · Tecnología y soluciones inteligentes</span>
     </section>
 
+
+    <section class="faq-section section-wrap" id="preguntas" aria-labelledby="faq-title">
+      <div class="section-heading"><span></span><h2>Preguntas <em>frecuentes</em></h2><span></span></div>
+      <p class="section-intro">Resolvemos algunas dudas antes de comenzar tu próximo proyecto.</p>
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary>¿Qué tipo de proyectos desarrolla MONTTECH?</summary>
+          <p>Desarrollamos sitios web, aplicaciones, soluciones de análisis de datos y herramientas para automatizar procesos, de acuerdo con las necesidades de cada proyecto.</p>
+        </details>
+        <details class="faq-item">
+          <summary>¿Puedo solicitar una solución personalizada?</summary>
+          <p>Sí. Cada idea se revisa para comprender sus objetivos, alcance y necesidades técnicas antes de proponer una solución.</p>
+        </details>
+        <details class="faq-item">
+          <summary>¿Cómo puedo solicitar una cotización?</summary>
+          <p>Cuéntanos qué necesitas mediante el formulario de contacto. El mensaje se preparará para que puedas enviarlo directamente por WhatsApp.</p>
+        </details>
+        <details class="faq-item">
+          <summary>¿Puedo recibir acompañamiento después de la entrega?</summary>
+          <p>Podemos conversar sobre soporte, ajustes y mantenimiento según las características y el alcance acordado para cada proyecto.</p>
+        </details>
+      </div>
+    </section>
+
     <section class="contact section-wrap" id="contacto">
-      <div><div class="eyebrow">HABLEMOS DE TU PROYECTO</div><h2>¿Listo para llevar tus ideas<br>a otro <em>nivel</em>?</h2><p>Cuéntanos qué necesitas. Construyamos juntos un mundo más digital.</p></div>
-      <div class="contact-actions"><a class="button" href="https://wa.me/573137250239" target="_blank" rel="noreferrer">Escríbenos por WhatsApp ↗</a><a class="mail-link" href="mailto:EdgarMontenegro199625@gmail.com">EdgarMontenegro199625@gmail.com</a></div>
+      <div class="contact-copy">
+        <div class="eyebrow">HABLEMOS DE TU PROYECTO</div>
+        <h2>¿Listo para llevar tus ideas<br>a otro <em>nivel</em>?</h2>
+        <p>Cuéntanos qué necesitas. Revisaremos tu idea para conversar sobre una posible solución tecnológica.</p>
+        <div class="contact-direct">
+          <a class="contact-direct-link" href="https://wa.me/573137250239" target="_blank" rel="noopener noreferrer">WhatsApp: 313 725 0239 ↗</a>
+          <a class="contact-direct-link" href="mailto:EdgarMontenegro199625@gmail.com">EdgarMontenegro199625@gmail.com</a>
+        </div>
+      </div>
+      <form class="contact-form" id="whatsapp-form">
+        <h3>Cuéntanos tu idea</h3>
+        <p>Completa estos datos para preparar tu mensaje.</p>
+        <label for="contact-name">Nombre</label>
+        <input id="contact-name" name="name" type="text" placeholder="¿Cómo te llamas?" autocomplete="name" maxlength="80" required>
+        <label for="contact-email">Correo electrónico <span>(opcional)</span></label>
+        <input id="contact-email" name="email" type="email" placeholder="correo@ejemplo.com" autocomplete="email" maxlength="120">
+        <label for="contact-service">Servicio que te interesa</label>
+        <select id="contact-service" name="service" required>
+          <option value="" selected disabled>Selecciona un servicio</option>
+          <option>Desarrollo web</option>
+          <option>Aplicaciones</option>
+          <option>Análisis de datos</option>
+          <option>Automatización</option>
+          <option>Soluciones en la nube</option>
+          <option>Soporte y consultoría</option>
+          <option>Otro / necesito orientación</option>
+        </select>
+        <label for="contact-message">Cuéntanos brevemente tu proyecto</label>
+        <textarea id="contact-message" name="message" rows="4" maxlength="1000" placeholder="¿Qué te gustaría desarrollar o mejorar?" required></textarea>
+        <button class="button contact-submit" type="submit">Preparar mensaje por WhatsApp <span>↗</span></button>
+        <small class="form-note">El formulario no almacena tus datos. Al continuar, se abrirá WhatsApp para que revises y envíes el mensaje.</small>
+        <p class="form-feedback" id="form-feedback" role="status" aria-live="polite"></p>
+      </form>
     </section>
   </main>
   <footer><a class="brand footer-brand" href="#inicio"><span class="brand-symbol"><b>M</b><i>↗</i></span><span class="brand-copy"><strong>MONT<span>TECH</span></strong><small>Tecnología y soluciones inteligentes</small></span></a><p>© <span id="year"></span> MONTTECH. Todos los derechos reservados.</p><a href="#inicio">Volver arriba ↑</a></footer>
