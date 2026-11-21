@@ -15,10 +15,27 @@
 @media(max-width:850px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.dashboard-grid{grid-template-columns:1fr}.donut-area{min-height:200px}}
 @media(max-width:560px){.shell{width:calc(100% - 28px)}.topbar{padding:14px}.top-actions{gap:9px}.status{font-size:9px}.back{font-size:10px}.page-head{display:block!important;padding-top:27px!important}.page-head .filters{margin-top:18px}.filters{gap:7px}.filter-btn,.select,.export{padding:9px 10px;font-size:10px}.kpis{gap:9px}.kpi{padding:14px}.kpi strong{font-size:22px}.kpi-top{font-size:9px}.panel{padding:14px}.panel-head{flex-direction:column}.table-tools{width:100%}.search{width:100%}.donut-area{gap:15px}.donut{width:128px;height:128px;flex-basis:128px}.donut:after{inset:20px}.legend-list{min-width:110px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+:root{--accent:#69f0c4}
+body[data-theme="ocean"]{--cyan:#55d9ff;--blue:#398dff;--accent:#55d9ff}
+body[data-theme="lavender"]{--cyan:#c1a7ff;--blue:#7b79ff;--accent:#e0b8ff}
+body[data-theme="sunrise"]{--cyan:#ffd18a;--blue:#ff9c9c;--accent:#ffb6a0}
+body[data-theme="aurora"]{--cyan:#69f0c4;--blue:#4ba9ff;--accent:#a3f7cf}
+.theme-label{color:var(--muted);font-size:10px}
+.import-label{display:inline-flex;align-items:center;padding:9px 12px;border:1px solid var(--cyan);border-radius:9px;color:var(--cyan);background:rgba(0,190,255,.1);font-size:10px;cursor:pointer;white-space:nowrap}
+.import-label:hover{background:rgba(0,190,255,.2)}
+.stats-panel{margin-bottom:16px}
+.stats-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.stats-grid article{padding:14px;border:1px solid var(--line);border-radius:11px;background:rgba(0,130,210,.07)}
+.stats-grid span{display:block;color:var(--muted);font-size:10px}
+.stats-grid strong{display:block;margin-top:9px;color:var(--cyan);font-size:clamp(14px,2vw,20px);overflow-wrap:anywhere}
+#stats-note{margin-top:13px}
+@media(max-width:850px){.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.top-actions{flex-wrap:wrap;justify-content:flex-end}.stats-grid{gap:8px}.stats-grid article{padding:11px}}
 </style>
 </head>
 <body>
-<nav class="topbar"><a class="brand" href="index.html">MONT<span>TECH</span></a><div class="top-actions"><span class="status"><i class="dot"></i> Demo interactiva</span><a class="back" href="index.html">← Volver al sitio</a></div></nav>
+<nav class="topbar"><a class="brand" href="index.html">MONT<span>TECH</span></a><div class="top-actions"><label class="theme-label" for="dashboard-theme">Modo</label><select class="select" id="dashboard-theme" aria-label="Cambiar ambiente visual"><option value="aurora">Aurora</option><option value="ocean">Océano</option><option value="lavender">Lavanda</option><option value="sunrise">Esperanza</option></select><span class="status"><i class="dot"></i> Demo interactiva</span><a class="back" href="index.html">← Volver al sitio</a></div></nav>
 <main class="shell">
 <header class="page-head"><div><div class="eyebrow">MONTTECH · DATALAB</div><h1>Panel de análisis de datos</h1><p>Explora indicadores, tendencias y registros en una experiencia interactiva.</p></div><div class="filters" aria-label="Filtros del dashboard"><button class="filter-btn" data-range="7" aria-pressed="false">7 días</button><button class="filter-btn" data-range="30" aria-pressed="true">30 días</button><button class="filter-btn" data-range="90" aria-pressed="false">90 días</button><select class="select" id="category-filter" aria-label="Filtrar por categoría"><option value="all">Todas las categorías</option><option value="Web">Web</option><option value="Datos">Datos</option><option value="Aplicaciones">Aplicaciones</option><option value="Automatización">Automatización</option></select></div></header>
 <section class="kpis" aria-label="Indicadores principales">
@@ -31,8 +48,8 @@
 <article class="panel"><div class="panel-head"><div><h2>Evolución diaria</h2><p class="panel-sub">Volumen de registros por fecha</p></div><div class="legend"><span>Registros</span></div></div><div class="chart-wrap"><canvas id="trend-chart" role="img" aria-label="Gráfico de línea de registros diarios"></canvas><div class="chart-tooltip" id="trend-tooltip"></div></div></article>
 <article class="panel"><div class="panel-head"><div><h2>Distribución por categoría</h2><p class="panel-sub">Participación dentro de la selección</p></div></div><div class="donut-area"><div class="donut" id="donut-chart" role="img" aria-label="Gráfico circular de categorías"><div class="donut-center"><strong id="donut-total">0</strong><small>registros</small></div></div><div class="legend-list" id="category-legend"></div></div></article>
 </section>
-<section class="panel table-panel"><div class="panel-head"><div><h2>Registros recientes</h2><p class="panel-sub">Consulta y filtra los datos de demostración</p></div><div class="table-tools"><input class="search" id="table-search" type="search" placeholder="Buscar categoría o fecha..." aria-label="Buscar en registros"><button class="export" id="export-csv" type="button">Exportar CSV ↓</button></div></div><div class="table-scroll"><table><thead><tr><th>Fecha</th><th>Categoría</th><th>Descripción</th><th>Valor</th><th>Estado</th></tr></thead><tbody id="data-table"></tbody></table></div><p class="panel-sub" id="table-count" aria-live="polite"></p></section>
-<p class="footnote"><strong>Nota:</strong> todos los registros y valores de este panel son ficticios y se utilizan exclusivamente para demostrar las capacidades de visualización y filtrado de MONTTECH. No representan resultados comerciales ni datos de clientes.</p>
+<section class="panel table-panel"><div class="panel-head"><div><h2>Registros recientes</h2><p class="panel-sub">Consulta y filtra los datos de demostración</p></div><div class="table-tools"><label class="import-label" for="csv-file">Cargar CSV</label><input id="csv-file" type="file" accept=".csv,text/csv" hidden><input class="search" id="table-search" type="search" placeholder="Buscar categoría o fecha..." aria-label="Buscar en registros"><button class="export" id="export-csv" type="button">Exportar CSV ↓</button></div></div><div class="table-scroll"><table><thead><tr><th>Fecha</th><th>Categoría</th><th>Descripción</th><th>Valor</th><th>Estado</th></tr></thead><tbody id="data-table"></tbody></table></div><p class="panel-sub" id="table-count" aria-live="polite"></p></section>
+<section class="panel stats-panel"><div class="panel-head"><div><h2>Resumen estadístico</h2><p class="panel-sub">Calculado sobre los valores numéricos del conjunto filtrado</p></div></div><div class="stats-grid"><article><span>Media</span><strong id="stat-mean">—</strong></article><article><span>Mediana</span><strong id="stat-median">—</strong></article><article><span>Desviación estándar</span><strong id="stat-sd">—</strong></article><article><span>Varianza muestral</span><strong id="stat-variance">—</strong></article><article><span>Coeficiente de variación</span><strong id="stat-cv">—</strong></article></div><p class="panel-sub" id="stats-note">Estadísticos calculados con los datos visibles del período.</p></section>\n<p class="footnote"><strong>Nota:</strong> los datos iniciales son ficticios. Puedes cargar un CSV propio; el archivo se procesa localmente en tu navegador y no se envía a un servidor.</p>
 </main>
 <footer class="shell">MONTTECH · Tecnología y soluciones inteligentes · DataLab demostrativo</footer>
 <script>
@@ -101,7 +118,42 @@
     byId('data-table').innerHTML=rows.length?rows.map(r=>'<tr><td>'+r.date.toLocaleDateString('es-CO')+'</td><td><span class="pill">'+r.category+'</span></td><td>'+r.description+'</td><td>'+money(r.value)+'</td><td>'+r.status+'</td></tr>').join(''):'<tr><td colspan="5" class="empty">No se encontraron registros con esos criterios.</td></tr>';
     byId('table-count').textContent='Mostrando '+number(rows.length)+' de '+number(visible.length)+' registros filtrados.';
   }
-  function render() {
+
+  function updateStatistics(data) {
+    const values=data.map(r=>Number(r.value)).filter(Number.isFinite).sort((a,b)=>a-b);
+    const n=values.length,mean=n?values.reduce((a,b)=>a+b,0)/n:0;
+    const median=n?(n%2?values[(n-1)/2]:(values[n/2-1]+values[n/2])/2):0;
+    const variance=n>1?values.reduce((s,v)=>s+(v-mean)**2,0)/(n-1):0;
+    const sd=Math.sqrt(variance),cv=mean!==0?sd/Math.abs(mean)*100:0;
+    byId('stat-mean').textContent=n?money(mean):'—';
+    byId('stat-median').textContent=n?money(median):'—';
+    byId('stat-sd').textContent=n?money(sd):'—';
+    byId('stat-variance').textContent=n?new Intl.NumberFormat('es-CO',{maximumFractionDigits:1}).format(variance):'—';
+    byId('stat-cv').textContent=n?cv.toFixed(2)+'%':'—';
+    byId('stats-note').textContent=n>1?'n = '+number(n)+' · Varianza y desviación estándar muestrales (n − 1).':'Se requieren al menos dos valores para estimar la dispersión muestral.';
+  }
+  function parseCSV(source) {
+    const rows=[];let row=[],cell='',quoted=false;
+    for(let i=0;i<source.length;i++){
+      const ch=source[i],next=source[i+1];
+      if(ch==='"'&&quoted&&next==='"'){cell+='"';i++;}
+      else if(ch==='"')quoted=!quoted;
+      else if((ch===','||ch===';'||ch==='\\t')&&!quoted){row.push(cell.trim());cell='';}
+      else if((ch==='\\n'||ch==='\\r')&&!quoted){if(ch==='\\r'&&next==='\\n')i++;row.push(cell.trim());if(row.some(v=>v!==''))rows.push(row);row=[];cell='';}
+      else cell+=ch;
+    }
+    row.push(cell.trim());if(row.some(v=>v!==''))rows.push(row);
+    if(quoted)throw new Error('El CSV contiene comillas sin cerrar.');
+    if(rows.length<2)throw new Error('El archivo debe incluir encabezados y al menos un registro.');
+    const norm=s=>s.normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
+    const headers=rows[0].map(norm),find=names=>headers.findIndex(h=>names.includes(h));
+    const ix={date:find(['fecha','date']),category:find(['categoria','category']),description:find(['descripcion','description','detalle']),value:find(['valor','value','monto','amount']),status:find(['estado','status'])};
+    if(ix.date<0||ix.category<0||ix.value<0)throw new Error('Se requieren columnas Fecha, Categoria y Valor. Descripcion y Estado son opcionales.');
+    const dateOf=s=>{let m=s.match(/^(\\d{4})-(\\d{1,2})-(\\d{1,2})$/);if(m)return new Date(+m[1],+m[2]-1,+m[3]);m=s.match(/^(\\d{1,2})[\\/.-](\\d{1,2})[\\/.-](\\d{4})$/);if(m)return new Date(+m[3],+m[2]-1,+m[1]);return new Date(s);};
+    const numOf=s=>{let v=String(s).replace(/[^\\d,.-]/g,'');if(v.includes(',')&&v.includes('.'))v=v.lastIndexOf(',')>v.lastIndexOf('.')?v.replace(/\\./g,'').replace(',','.'):v.replace(/,/g,'');else if(v.includes(','))v=v.replace(',','.');return Number(v);};
+    return rows.slice(1).map((r,i)=>{const date=dateOf(r[ix.date]||''),value=numOf(r[ix.value]||'');if(!Number.isFinite(date.getTime())||!Number.isFinite(value))throw new Error('Fecha o valor no válido en fila '+(i+2)+'.');return {date:new Date(date.getFullYear(),date.getMonth(),date.getDate()),category:r[ix.category]||'Sin categoría',description:ix.description>=0?(r[ix.description]||'Registro importado'):'Registro importado',value,status:ix.status>=0?(r[ix.status]||'Importado'):'Importado'};});
+  }
+\n  function render() {
     filtered=selectedRecords();
     const total=filtered.reduce((s,r)=>s+r.value,0),avg=filtered.length?total/filtered.length:0;
     byId('kpi-records').textContent=number(filtered.length);
@@ -110,7 +162,7 @@
     byId('kpi-categories').textContent=number(new Set(filtered.map(r=>r.category)).size);
     byId('kpi-records-note').textContent='Últimos '+days+' días · datos de muestra';
     byId('kpi-value-note').textContent='Acumulado ficticio del período';
-    drawLine(filtered);renderDonut(filtered);renderTable(filtered);
+    drawLine(filtered);renderDonut(filtered);renderTable(filtered);updateStatistics(filtered);
   }
   document.querySelectorAll('[data-range]').forEach(btn=>btn.addEventListener('click',()=>{days=Number(btn.dataset.range);document.querySelectorAll('[data-range]').forEach(b=>b.setAttribute('aria-pressed',String(b===btn)));render();}));
   byId('category-filter').addEventListener('change',e=>{category=e.target.value;render();});
