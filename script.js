@@ -22,6 +22,15 @@ if (toggle && nav) {
 
   });
 
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && nav.classList.contains('open')) {
+      nav.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.textContent = '☰';
+      toggle.focus();
+    }
+  });
+
   document.querySelectorAll('.nav-links a').forEach(link => {
 
     link.addEventListener('click', () => {
@@ -163,4 +172,27 @@ if ('IntersectionObserver' in window) {
         section.classList.add('is-visible');
     });
 
+}
+
+
+/* =========================================
+   6. NAVEGACIÓN ACTIVA SEGÚN LA SECCIÓN
+========================================= */
+const navigationLinks = document.querySelectorAll('.nav-links a');
+const observedSections = document.querySelectorAll('main section[id]');
+
+if ('IntersectionObserver' in window && navigationLinks.length && observedSections.length) {
+  const navigationObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      navigationLinks.forEach(link => {
+        const active = link.getAttribute('href') === '#' + entry.target.id;
+        link.classList.toggle('active', active);
+        if (active) link.setAttribute('aria-current', 'location');
+        else link.removeAttribute('aria-current');
+      });
+    });
+  }, { rootMargin: '-25% 0px -65% 0px', threshold: 0 });
+
+  observedSections.forEach(section => navigationObserver.observe(section));
 }
