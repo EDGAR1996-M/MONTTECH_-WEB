@@ -26,6 +26,16 @@ body[data-theme="aurora"]{--cyan:#69f0c4;--blue:#4ba9ff;--accent:#a3f7cf}
 .import-label{display:inline-flex;align-items:center;padding:9px 12px;border:1px solid var(--cyan);border-radius:9px;color:var(--cyan);background:rgba(0,190,255,.1);font-size:10px;cursor:pointer;white-space:nowrap}
 .import-label:hover{background:rgba(0,190,255,.2)}
 .stats-panel{margin-bottom:16px}
+.agro-panel{margin-bottom:18px}
+.agro-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:14px 0}
+.agro-metric{padding:13px;border:1px solid var(--line);border-radius:11px;background:rgba(75,169,255,.07)}
+.agro-metric small{display:block;color:var(--muted);font-size:10px}
+.agro-metric strong{display:block;margin-top:8px;color:var(--cyan);font-size:19px}
+.agro-table-wrap{overflow-x:auto}
+.agro-table{min-width:650px}
+.agro-bar{height:8px;min-width:3px;border-radius:20px;background:linear-gradient(90deg,var(--cyan),var(--blue));margin-top:5px}
+.agro-filter-note{color:var(--muted);font-size:10px}
+@media print{.agro-panel{break-inside:avoid}.agro-table{min-width:0!important}}
 .stats-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
 .stats-grid article{padding:14px;border:1px solid var(--line);border-radius:11px;background:rgba(0,130,210,.07)}
 .stats-grid span{display:block;color:var(--muted);font-size:10px}
@@ -67,9 +77,15 @@ body[data-theme="aurora"]{--cyan:#69f0c4;--blue:#4ba9ff;--accent:#a3f7cf}
 <article class="panel"><div class="panel-head"><div><h2>Evolución diaria</h2><p class="panel-sub">Volumen de registros por fecha</p></div><div class="legend"><span>Registros</span></div></div><div class="chart-wrap"><canvas id="trend-chart" role="img" aria-label="Gráfico de línea de registros diarios"></canvas><div class="chart-tooltip" id="trend-tooltip"></div></div></article>
 <article class="panel"><div class="panel-head"><div><h2>Distribución por categoría</h2><p class="panel-sub">Participación dentro de la selección</p></div></div><div class="donut-area"><div class="donut" id="donut-chart" role="img" aria-label="Gráfico circular de categorías"><div class="donut-center"><strong id="donut-total">0</strong><small>registros</small></div></div><div class="legend-list" id="category-legend"></div></div></article>
 </section>
-<section class="panel table-panel"><div class="panel-head"><div><h2>Registros recientes</h2><p class="panel-sub">Consulta y filtra los datos de demostración</p></div><div class="table-tools"><label class="import-label" for="csv-file">Cargar CSV / Excel</label><input id="csv-file" type="file" accept=".csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" hidden><input class="search" id="table-search" type="search" placeholder="Buscar categoría o fecha..." aria-label="Buscar en registros"><button class="export" id="template-csv" type="button">Plantilla CSV ↓</button><button class="export" id="export-csv" type="button">Exportar CSV ↓</button><button class="export" id="export-pdf" type="button">Informe PDF ↗</button></div></div><div class="table-scroll"><table><thead><tr><th>Fecha</th><th>Categoría</th><th>Descripción</th><th>Valor</th><th>Estado</th></tr></thead><tbody id="data-table"></tbody></table></div><p class="panel-sub" id="table-count" aria-live="polite"></p></section>
+<section class="panel table-panel"><div class="panel-head"><div><h2>Registros recientes</h2><p class="panel-sub">Consulta y filtra los datos de demostración</p></div><div class="table-tools"><label class="import-label" for="csv-file">Cargar CSV / Excel</label><input id="csv-file" type="file" accept=".csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" hidden><input class="search" id="table-search" type="search" placeholder="Buscar categoría o fecha..." aria-label="Buscar en registros"><button class="export" id="template-csv" type="button">Plantilla general ↓</button><button class="export" id="template-agro" type="button">Plantilla AgroData ↓</button><button class="export" id="export-csv" type="button">Exportar CSV ↓</button><button class="export" id="export-pdf" type="button">Informe PDF ↗</button></div></div><div class="table-scroll"><table><thead><tr><th>Fecha</th><th>Categoría</th><th>Descripción</th><th>Valor</th><th>Estado</th></tr></thead><tbody id="data-table"></tbody></table></div><p class="panel-sub" id="table-count" aria-live="polite"></p></section>
 <section class="panel stats-panel"><div class="panel-head"><div><h2>Resumen estadístico</h2><p class="panel-sub">Calculado sobre los valores numéricos del conjunto filtrado</p></div></div><div class="stats-grid"><article><span>Media</span><strong id="stat-mean">—</strong></article><article><span>Mediana</span><strong id="stat-median">—</strong></article><article><span>Desviación estándar</span><strong id="stat-sd">—</strong></article><article><span>Varianza muestral</span><strong id="stat-variance">—</strong></article><article><span>Coeficiente de variación</span><strong id="stat-cv">—</strong></article></div><p class="panel-sub" id="stats-note">Estadísticos calculados con los datos visibles del período.</p></section>
-<p class="footnote"><strong>Nota:</strong> los datos iniciales son ficticios. Puedes cargar archivos CSV o Excel (.xlsx/.xls); el archivo se procesa localmente en tu navegador y no se envía a un servidor. Para PDF utiliza “Informe PDF” y selecciona Guardar como PDF en el diálogo de impresión.</p>
+<section class="panel agro-panel" aria-labelledby="agro-title">
+<div class="panel-head"><div><div class="eyebrow">MONTTECH · AGRODATA</div><h2 id="agro-title">Comparación de tratamientos agrícolas</h2><p class="panel-sub">Compara mediciones reales agrupadas por variable y tratamiento.</p></div><select class="select" id="agro-variable" aria-label="Seleccionar variable agrícola"><option value="all">Todas las variables</option></select></div>
+<div class="agro-summary" id="agro-summary"><p class="empty">Carga una plantilla AgroData para comenzar a comparar tratamientos.</p></div>
+<div class="agro-table-wrap"><table class="agro-table"><thead><tr><th>Variable</th><th>Tratamiento</th><th>n</th><th>Media</th><th>Desv. estándar</th><th>CV (%)</th></tr></thead><tbody id="agro-table"><tr><td colspan="6" class="empty">Aún no hay mediciones agrícolas importadas.</td></tr></tbody></table></div>
+<p class="panel-sub" id="agro-note">Se mostrarán estadísticas descriptivas por tratamiento. No se generan conclusiones causales automáticamente.</p>
+</section>
+<p class="footnote"><strong>Nota:</strong> los datos iniciales son ficticios. Puedes cargar archivos CSV o Excel (.xlsx/.xls); el archivo se procesa localmente en tu navegador y no se envía a un servidor. Para AgroData usa la plantilla específica con columnas de cultivo, variedad, tratamiento, variable, unidad y repetición. Los resultados son descriptivos; no sustituyen un análisis inferencial.</p>
 </main>
 <footer class="shell">MONTTECH · Tecnología y soluciones inteligentes · DataLab demostrativo</footer>
 <script>
@@ -159,6 +175,34 @@ body[data-theme="aurora"]{--cyan:#69f0c4;--blue:#4ba9ff;--accent:#a3f7cf}
     byId('stat-cv').textContent=n?cv.toFixed(2)+'%':'—';
     byId('stats-note').textContent=n>1?'n = '+number(n)+' · Varianza y desviación estándar muestrales (n − 1).':'Se requieren al menos dos valores para estimar la dispersión muestral.';
   }
+
+  function renderAgro(data) {
+    const rows=data.filter(r=>r.treatment&&r.variable&&Number.isFinite(Number(r.value)));
+    const variables=[...new Set(rows.map(r=>r.variable))].sort((a,b)=>a.localeCompare(b,'es'));
+    const picker=byId('agro-variable'),selected=picker.value;
+    picker.innerHTML='<option value="all">Todas las variables</option>'+variables.map(v=>'<option value="'+escapeHTML(v)+'">'+escapeHTML(v)+'</option>').join('');
+    picker.value=variables.includes(selected)?selected:'all';
+    const chosen=picker.value==='all'?rows:rows.filter(r=>r.variable===picker.value);
+    if(!chosen.length){
+      byId('agro-summary').innerHTML='<p class="empty">'+(rows.length?'No hay mediciones para esta variable.':'Carga un archivo con columnas Tratamiento, Variable y Valor para activar AgroData.')+'</p>';
+      byId('agro-table').innerHTML='<tr><td colspan="6" class="empty">Sin datos agrícolas para comparar.</td></tr>';
+      byId('agro-note').textContent='La plantilla AgroData permite registrar mediciones por fecha, cultivo, variedad, tratamiento, variable, unidad y repetición.';
+      return;
+    }
+    const treatments=[...new Set(chosen.map(r=>r.treatment))].sort((a,b)=>a.localeCompare(b,'es'));
+    const stats=treatments.map(name=>{
+      const subset=chosen.filter(r=>r.treatment===name),values=subset.map(r=>Number(r.value)),n=values.length,mean=values.reduce((a,b)=>a+b,0)/n;
+      const variance=n>1?values.reduce((s,v)=>s+(v-mean)**2,0)/(n-1):0,sd=Math.sqrt(variance),cv=mean!==0?sd/Math.abs(mean)*100:0;
+      return {name,n,mean,sd,cv,unit:subset.find(r=>r.unit)?.unit||''};
+    });
+    const best=stats.reduce((a,b)=>b.mean>a.mean?b:a,stats[0]),allN=chosen.length;
+    const crop=chosen.find(r=>r.crop)?.crop||'No especificado',variety=chosen.find(r=>r.variety)?.variety||'No especificada';
+    byId('agro-summary').innerHTML='<article class="agro-metric"><small>Mediciones válidas</small><strong>'+number(allN)+'</strong></article><article class="agro-metric"><small>Tratamientos comparados</small><strong>'+number(treatments.length)+'</strong></article><article class="agro-metric"><small>Cultivo / variedad</small><strong style="font-size:14px">'+escapeHTML(crop)+' / '+escapeHTML(variety)+'</strong></article><article class="agro-metric"><small>Mayor media observada</small><strong style="font-size:14px">'+escapeHTML(best.name)+'</strong></article>';
+    const maxMean=Math.max(1,...stats.map(s=>Math.abs(s.mean)));
+    byId('agro-table').innerHTML=stats.map(s=>'<tr><td>'+escapeHTML(picker.value==='all'?'Todas / '+variables.join(', '):picker.value)+'</td><td><span class="pill">'+escapeHTML(s.name)+'</span><div class="agro-bar" style="width:'+Math.max(3,Math.abs(s.mean)/maxMean*100)+'%"></div></td><td>'+number(s.n)+'</td><td>'+s.mean.toLocaleString('es-CO',{maximumFractionDigits:3})+' '+escapeHTML(s.unit)+'</td><td>'+s.sd.toLocaleString('es-CO',{maximumFractionDigits:3})+'</td><td>'+s.cv.toFixed(2)+'%</td></tr>').join('');
+    byId('agro-note').textContent='Estadística descriptiva · media, desviación estándar muestral y CV. La media mayor no implica por sí sola que un tratamiento sea estadísticamente superior.';
+  }
+
   function parseCSV(source) {
     const rows=[];let row=[],cell='',quoted=false;
     for(let i=0;i<source.length;i++){
@@ -174,11 +218,12 @@ body[data-theme="aurora"]{--cyan:#69f0c4;--blue:#4ba9ff;--accent:#a3f7cf}
     if(rows.length<2)throw new Error('El archivo debe incluir encabezados y al menos un registro.');
     const norm=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
     const headers=rows[0].map(norm),find=names=>headers.findIndex(h=>names.includes(h));
-    const ix={date:find(['fecha','date']),category:find(['categoria','category']),description:find(['descripcion','description','detalle']),value:find(['valor','value','monto','amount']),status:find(['estado','status'])};
-    if(ix.date<0||ix.category<0||ix.value<0)throw new Error('Se requieren columnas Fecha, Categoria y Valor. Descripcion y Estado son opcionales.');
+    const ix={date:find(['fecha','date']),category:find(['categoria','category']),description:find(['descripcion','description','detalle']),value:find(['valor','value','monto','amount']),status:find(['estado','status']),treatment:find(['tratamiento','treatment','sustrato']),variable:find(['variable','indicador','measurement']),unit:find(['unidad','unit']),crop:find(['cultivo','crop']),variety:find(['variedad','variety']),replicate:find(['repeticion','replica','replicate'])};
+    if(ix.date<0||ix.value<0||(ix.category<0&&ix.treatment<0))throw new Error('Se requieren Fecha, Valor y Categoria o Tratamiento. Para AgroData agrega Variable, Unidad, Cultivo y Variedad si aplica.');
+    if(ix.category<0)ix.category=ix.treatment;
     const dateOf=s=>{let m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);if(m)return new Date(+m[1],+m[2]-1,+m[3]);m=s.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/);if(m)return new Date(+m[3],+m[2]-1,+m[1]);return new Date(s);};
     const numOf=s=>{let v=String(s).replace(/[^\d,.-]/g,'');if(v.includes(',')&&v.includes('.'))v=v.lastIndexOf(',')>v.lastIndexOf('.')?v.replace(/\./g,'').replace(',','.'):v.replace(/,/g,'');else if(v.includes(','))v=v.replace(',','.');return Number(v);};
-    return rows.slice(1).map((r,i)=>{const date=dateOf(r[ix.date]||''),value=numOf(r[ix.value]||'');if(!Number.isFinite(date.getTime())||!Number.isFinite(value))throw new Error('Fecha o valor no válido en fila '+(i+2)+'.');return {date:new Date(date.getFullYear(),date.getMonth(),date.getDate()),category:r[ix.category]||'Sin categoría',description:ix.description>=0?(r[ix.description]||'Registro importado'):'Registro importado',value,status:ix.status>=0?(r[ix.status]||'Importado'):'Importado'};});
+    return rows.slice(1).map((r,i)=>{const date=dateOf(r[ix.date]||''),value=numOf(r[ix.value]||'');if(!Number.isFinite(date.getTime())||!Number.isFinite(value))throw new Error('Fecha o valor no válido en fila '+(i+2)+'.');const treatment=ix.treatment>=0?(r[ix.treatment]||r[ix.category]||''):(r[ix.category]||'');const variable=ix.variable>=0?(r[ix.variable]||'') : '';return {date:new Date(date.getFullYear(),date.getMonth(),date.getDate()),category:r[ix.category]||treatment||'Sin categoría',description:ix.description>=0?(r[ix.description]||variable||'Registro importado'):(variable||'Registro importado'),value,status:ix.status>=0?(r[ix.status]||'Importado'):'Importado',treatment,variable,unit:ix.unit>=0?(r[ix.unit]||''):'',crop:ix.crop>=0?(r[ix.crop]||''):'',variety:ix.variety>=0?(r[ix.variety]||''):'',replicate:ix.replicate>=0?(r[ix.replicate]||''):'',};});
   }
   function render() {
     filtered=selectedRecords();
@@ -190,16 +235,21 @@ body[data-theme="aurora"]{--cyan:#69f0c4;--blue:#4ba9ff;--accent:#a3f7cf}
     byId('kpi-categories').textContent=number(new Set(filtered.map(r=>r.category)).size);
     byId('kpi-records-note').textContent='Últimos '+days+' días · datos de muestra';
     byId('kpi-value-note').textContent='Acumulado ficticio del período';
-    drawLine(filtered);renderDonut(filtered);renderTable(filtered);updateStatistics(filtered);
+    drawLine(filtered);renderDonut(filtered);renderTable(filtered);updateStatistics(filtered);renderAgro(filtered);
   }
   document.querySelectorAll('[data-range]').forEach(btn=>btn.addEventListener('click',()=>{days=Number(btn.dataset.range);document.querySelectorAll('[data-range]').forEach(b=>b.setAttribute('aria-pressed',String(b===btn)));render();}));
   byId('category-filter').addEventListener('change',e=>{category=e.target.value;render();});
   byId('table-search').addEventListener('input',e=>{search=e.target.value.trim().toLowerCase();renderTable(filtered);});
+  byId('agro-variable').addEventListener('change',()=>renderAgro(filtered));
 
   byId('template-csv').addEventListener('click',()=>{
     const sample='Fecha,Categoria,Descripcion,Valor,Estado\r\n2026-11-01,Web,Desarrollo web,250000,Completado\r\n2026-11-02,Datos,Analisis estadistico,180000,Completado\r\n';
     const blob=new Blob(['\uFEFF'+sample],{type:'text/csv;charset=utf-8;'});
     const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='plantilla-monttech.csv';a.click();URL.revokeObjectURL(url);
+  });
+  byId('template-agro').addEventListener('click',()=>{
+    const sample='Fecha,Cultivo,Variedad,Tratamiento,Variable,Unidad,Repeticion,Valor\\r\\n2026-11-01,Arandano,Sara,Fibra de coco,Altura,cm,1,24.5\\r\\n2026-11-01,Arandano,Sara,Fibra de coco,Altura,cm,2,25.1\\r\\n2026-11-01,Arandano,Sara,Cascarilla de arroz,Altura,cm,1,22.8\\r\\n2026-11-01,Arandano,Sara,Cascarilla de arroz,Altura,cm,2,23.4\\r\\n2026-11-01,Arandano,Sara,Fibra de coco,Numero de brotes,unidad,1,5\\r\\n2026-11-01,Arandano,Sara,Cascarilla de arroz,Numero de brotes,unidad,1,4\\r\\n';
+    const blob=new Blob(['\\uFEFF'+sample],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='plantilla-agrodata-monttech.csv';a.click();URL.revokeObjectURL(url);
   });
   byId('export-pdf').addEventListener('click',()=>{
     const previous=document.title;document.title='Informe DataLab - MONTTECH';
