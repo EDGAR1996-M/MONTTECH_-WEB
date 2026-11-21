@@ -66,7 +66,7 @@ body[data-theme="aurora"]{--cyan:#69f0c4;--blue:#4ba9ff;--accent:#a3f7cf}
 <body>
 <nav class="topbar"><a class="brand" href="index.html">MONT<span>TECH</span></a><div class="top-actions"><label class="theme-label" for="dashboard-theme">Modo</label><select class="select" id="dashboard-theme" aria-label="Cambiar ambiente visual"><option value="aurora">Aurora</option><option value="ocean">Océano</option><option value="lavender">Lavanda</option><option value="sunrise">Esperanza</option></select><span class="status"><i class="dot"></i> Demo interactiva</span><a class="back" href="index.html">← Volver al sitio</a></div></nav>
 <main class="shell">
-<header class="page-head"><div><div class="eyebrow">MONTTECH · DATALAB</div><h1>Panel de análisis de datos</h1><p>Explora indicadores, tendencias y registros en una experiencia interactiva.</p></div><div class="filters" aria-label="Filtros del dashboard"><button class="filter-btn" data-range="7" aria-pressed="false">7 días</button><button class="filter-btn" data-range="30" aria-pressed="true">30 días</button><button class="filter-btn" data-range="90" aria-pressed="false">90 días</button><select class="select" id="category-filter" aria-label="Filtrar por categoría"><option value="all">Todas las categorías</option><option value="Web">Web</option><option value="Datos">Datos</option><option value="Aplicaciones">Aplicaciones</option><option value="Automatización">Automatización</option></select></div></header>
+<header class="page-head"><div><div class="eyebrow">MONTTECH · DATALAB</div><h1>Panel de análisis de datos</h1><p>Explora indicadores, tendencias y registros en una experiencia interactiva.</p></div><div class="filters" aria-label="Filtros del dashboard"><button class="filter-btn" data-range="7" aria-pressed="false">7 días</button><button class="filter-btn" data-range="30" aria-pressed="true">30 días</button><button class="filter-btn" data-range="90" aria-pressed="false">90 días</button><button class="filter-btn" data-range="all" aria-pressed="false">Todo</button><select class="select" id="category-filter" aria-label="Filtrar por categoría"><option value="all">Todas las categorías</option><option value="Web">Web</option><option value="Datos">Datos</option><option value="Aplicaciones">Aplicaciones</option><option value="Automatización">Automatización</option></select></div></header>
 <section class="kpis" aria-label="Indicadores principales">
 <article class="kpi"><div class="kpi-top"><span>Registros analizados</span><i class="kpi-icon">▤</i></div><strong id="kpi-records">—</strong><span class="trend" id="kpi-records-note">En el período seleccionado</span></article>
 <article class="kpi"><div class="kpi-top"><span>Valor acumulado</span><i class="kpi-icon">$</i></div><strong id="kpi-value">—</strong><span class="trend" id="kpi-value-note">Suma de valores de muestra</span></article>
@@ -125,15 +125,16 @@ body[data-theme="aurora"]{--cyan:#69f0c4;--blue:#4ba9ff;--accent:#a3f7cf}
   }
   function selectedRecords() {
     const cutoff = new Date(today); cutoff.setDate(today.getDate()-(days-1)); cutoff.setHours(0,0,0,0);
-    return records.filter(r => r.date >= cutoff && (category==='all'||r.category===category));
+    return records.filter(r => (!days || r.date >= cutoff) && (category==='all'||r.category===category));
   }
   function drawLine(data) {
     const canvas=byId('trend-chart'),ctx=canvas.getContext('2d'),rect=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
+    const chartDays=days||Math.min(365,Math.max(1,Math.ceil((today-Math.min(...records.map(r=>r.date.getTime())))/86400000)+1));
     canvas.width=Math.max(1,Math.round(rect.width*dpr));canvas.height=Math.round(260*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
     const w=rect.width,h=260,p={l:35,r:12,t:14,b:32};
     ctx.clearRect(0,0,w,h);
     const totals=new Map();
-    for(let i=days-1;i>=0;i--){const d=new Date(today);d.setDate(today.getDate()-i);totals.set(d.toDateString(),0);}
+    for(let i=chartDays-1;i>=0;i--){const d=new Date(today);d.setDate(today.getDate()-i);totals.set(d.toDateString(),0);}
     data.forEach(r=>{const k=r.date.toDateString();if(totals.has(k))totals.set(k,totals.get(k)+1);});
     const vals=[...totals.values()],max=Math.max(4,...vals),plotW=w-p.l-p.r,plotH=h-p.t-p.b;
     ctx.font='10px Inter, sans-serif';ctx.fillStyle='#8fa7c3';ctx.strokeStyle='rgba(150,190,220,.13)';ctx.lineWidth=1;
@@ -144,8 +145,8 @@ body[data-theme="aurora"]{--cyan:#69f0c4;--blue:#4ba9ff;--accent:#a3f7cf}
       ctx.beginPath();points.forEach((pt,i)=>i?ctx.lineTo(pt.x,pt.y):ctx.moveTo(pt.x,pt.y));ctx.strokeStyle='#00e5ff';ctx.lineWidth=2.5;ctx.stroke();
       points.forEach(pt=>{ctx.beginPath();ctx.arc(pt.x,pt.y,2.5,0,Math.PI*2);ctx.fillStyle='#dffcff';ctx.fill();});
     }
-    const step=Math.max(1,Math.ceil(days/6));
-    [...totals.keys()].forEach((key,i)=>{if(i%step===0||i===days-1){const d=new Date(key);ctx.fillStyle='#8fa7c3';ctx.fillText(dateLabel(d),p.l+(days===1?0:i/(days-1))*plotW-13,h-9);}});
+    const step=Math.max(1,Math.ceil(chartDays/6));
+    [...totals.keys()].forEach((key,i)=>{if(i%step===0||i===days-1){const d=new Date(key);ctx.fillStyle='#8fa7c3';ctx.fillText(dateLabel(d),p.l+(chartDays===1?0:i/(chartDays-1))*plotW-13,h-9);}});
     canvas._points=points;canvas._labels=[...totals.keys()].map(k=>dateLabel(new Date(k)));
   }
   function renderDonut(data) {
@@ -233,11 +234,11 @@ body[data-theme="aurora"]{--cyan:#69f0c4;--blue:#4ba9ff;--accent:#a3f7cf}
     byId('kpi-value').textContent=money(total);
     byId('kpi-average').textContent=money(avg);
     byId('kpi-categories').textContent=number(new Set(filtered.map(r=>r.category)).size);
-    byId('kpi-records-note').textContent='Últimos '+days+' días · datos de muestra';
+    byId('kpi-records-note').textContent=(days?'Últimos '+days+' días':'Todo el historial')+' · '+(records.some(r=>r.status==='Completado'&&r.description==='Registro importado')?'datos importados':'datos de muestra');
     byId('kpi-value-note').textContent='Acumulado ficticio del período';
     drawLine(filtered);renderDonut(filtered);renderTable(filtered);updateStatistics(filtered);renderAgro(filtered);
   }
-  document.querySelectorAll('[data-range]').forEach(btn=>btn.addEventListener('click',()=>{days=Number(btn.dataset.range);document.querySelectorAll('[data-range]').forEach(b=>b.setAttribute('aria-pressed',String(b===btn)));render();}));
+  document.querySelectorAll('[data-range]').forEach(btn=>btn.addEventListener('click',()=>{days=btn.dataset.range==='all'?0:Number(btn.dataset.range);document.querySelectorAll('[data-range]').forEach(b=>b.setAttribute('aria-pressed',String(b===btn)));render();}));
   byId('category-filter').addEventListener('change',e=>{category=e.target.value;render();});
   byId('table-search').addEventListener('input',e=>{search=e.target.value.trim().toLowerCase();renderTable(filtered);});
   byId('agro-variable').addEventListener('change',()=>renderAgro(filtered));
@@ -293,8 +294,8 @@ body[data-theme="aurora"]{--cyan:#69f0c4;--blue:#4ba9ff;--accent:#a3f7cf}
       categories=[...new Set(imported.map(r=>r.category).filter(Boolean))];
       if(!categories.length)categories=['Sin categoría'];
       const latest=new Date(Math.max(...imported.map(r=>r.date.getTime())));
-      today.setTime(latest.getTime());days=90;category='all';search='';
-      document.querySelectorAll('[data-range]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.range)===90)));
+      today.setTime(latest.getTime());days=0;category='all';search='';
+      document.querySelectorAll('[data-range]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.range==='all')));
       byId('category-filter').value='all';byId('table-search').value='';
       render();
       byId('kpi-records-note').textContent='Archivo cargado: '+file.name;
