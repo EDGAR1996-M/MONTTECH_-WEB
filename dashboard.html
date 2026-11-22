@@ -77,7 +77,7 @@ body[data-theme="aurora"]{--cyan:#69f0c4;--blue:#4ba9ff;--accent:#a3f7cf}
 <article class="panel"><div class="panel-head"><div><h2>Evolución diaria</h2><p class="panel-sub">Volumen de registros por fecha</p></div><div class="legend"><span>Registros</span></div></div><div class="chart-wrap"><canvas id="trend-chart" role="img" aria-label="Gráfico de línea de registros diarios"></canvas><div class="chart-tooltip" id="trend-tooltip"></div></div></article>
 <article class="panel"><div class="panel-head"><div><h2>Distribución por categoría</h2><p class="panel-sub">Participación dentro de la selección</p></div></div><div class="donut-area"><div class="donut" id="donut-chart" role="img" aria-label="Gráfico circular de categorías"><div class="donut-center"><strong id="donut-total">0</strong><small>registros</small></div></div><div class="legend-list" id="category-legend"></div></div></article>
 </section>
-<section class="panel" id="import-workbench" hidden style="margin-bottom:16px"><div class="panel-head"><div><div class="eyebrow">IMPORTACIÓN INTELIGENTE</div><h2>Revisa y organiza tu archivo</h2><p class="panel-sub" id="import-file-note">Selecciona qué columna corresponde a cada dato. No necesitas cambiar tu Excel.</p></div></div><div class="stats-grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))"><label class="panel-sub">Columna de valores *<select class="select" id="map-value" style="display:block;width:100%;margin-top:7px"></select></label><label class="panel-sub">Fecha (opcional)<select class="select" id="map-date" style="display:block;width:100%;margin-top:7px"></select></label><label class="panel-sub">Categoría / grupo<select class="select" id="map-category" style="display:block;width:100%;margin-top:7px"></select></label><label class="panel-sub">Descripción<select class="select" id="map-description" style="display:block;width:100%;margin-top:7px"></select></label></div><p class="panel-sub" id="import-preview-note" aria-live="polite" style="margin:14px 0 8px"></p><div class="table-scroll"><table><thead><tr id="import-preview-head"></tr></thead><tbody id="import-preview-body"></tbody></table></div><div class="filters" style="margin-top:14px"><button class="export" id="import-confirm" type="button">Usar estos datos</button><button class="filter-btn" id="import-cancel" type="button">Cancelar</button></div></section><section class="panel table-panel"><div class="panel-head"><div><h2>Registros recientes</h2><p class="panel-sub">Consulta y filtra los datos de demostración</p></div><div class="table-tools"><label class="import-label" for="csv-file">Cargar CSV / Excel</label><input id="csv-file" type="file" accept=".csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" hidden><input class="search" id="table-search" type="search" placeholder="Buscar categoría o fecha..." aria-label="Buscar en registros"><button class="export" id="template-csv" type="button">Plantilla general ↓</button><button class="export" id="template-agro" type="button">Plantilla AgroData ↓</button><button class="export" id="export-csv" type="button">Exportar CSV ↓</button><button class="export" id="export-pdf" type="button">Informe PDF ↗</button></div></div><div class="table-scroll"><table><thead><tr><th>Fecha</th><th>Categoría</th><th>Descripción</th><th>Valor</th><th>Estado</th></tr></thead><tbody id="data-table"></tbody></table></div><p class="panel-sub" id="table-count" aria-live="polite"></p></section>
+<section class="panel" id="import-workbench" hidden style="margin-bottom:16px"><div class="panel-head"><div><div class="eyebrow">IMPORTACIÓN INTELIGENTE</div><h2>Revisa y organiza tu archivo</h2><p class="panel-sub" id="import-file-note">Selecciona qué columna corresponde a cada dato. No necesitas cambiar tu Excel.</p></div></div><div class="stats-grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))"><label class="panel-sub">Columna de valores *<select class="select" id="map-value" style="display:block;width:100%;margin-top:7px"></select></label><label class="panel-sub">Fecha (opcional)<select class="select" id="map-date" style="display:block;width:100%;margin-top:7px"></select></label><label class="panel-sub">Categoría / grupo<select class="select" id="map-category" style="display:block;width:100%;margin-top:7px"></select></label><label class="panel-sub">Descripción<select class="select" id="map-description" style="display:block;width:100%;margin-top:7px"></select></label></div><p class="panel-sub" id="import-preview-note" aria-live="polite" style="margin:14px 0 8px"></p><div class="table-scroll"><table><thead><tr id="import-preview-head"></tr></thead><tbody id="import-preview-body"></tbody></table></div><div class="filters" style="margin-top:14px"><button class="export" id="import-confirm" type="button">Usar estos datos</button><button class="filter-btn" id="import-cancel" type="button">Cancelar</button></div></section><section class="panel" id="repair-workbench" hidden style="margin-bottom:16px"><div class="panel-head"><div><div class="eyebrow">LIMPIEZA SEGURA</div><h2>Revisemos los datos</h2><p class="panel-sub" id="repair-summary">DataLab encontró detalles que puedes corregir.</p></div></div><div class="stats-grid" style="grid-template-columns:repeat(auto-fit,minmax(135px,1fr))"><article><span>Filas vacías</span><strong id="repair-blanks">0</strong></article><article><span>Duplicados</span><strong id="repair-duplicates">0</strong></article><article><span>Encabezados repetidos</span><strong id="repair-headers">0</strong></article><article><span>Valores faltantes</span><strong id="repair-missing">0</strong></article><article><span>Fechas reconocidas</span><strong id="repair-dates">0</strong></article></div><p class="panel-sub">Selecciona las correcciones. El archivo original nunca se modifica.</p><div class="filters" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px"><label><input type="checkbox" id="repair-trim" checked> Quitar espacios sobrantes</label><label><input type="checkbox" id="repair-duplicates-toggle" checked> Eliminar duplicados</label><label><input type="checkbox" id="repair-header-toggle" checked> Quitar encabezados repetidos</label><label><input type="checkbox" id="repair-missing-toggle" checked> Excluir valores faltantes</label></div><p class="panel-sub" id="repair-preview-note" aria-live="polite"></p><div class="filters" style="margin-top:12px"><button class="export" id="repair-apply" type="button">Aplicar limpieza y analizar</button><button class="filter-btn" id="repair-keep" type="button">Continuar sin limpiar</button><button class="filter-btn" id="repair-back" type="button">Volver</button></div></section><section class="panel table-panel"><div class="panel-head"><div><h2>Registros recientes</h2><p class="panel-sub">Consulta y filtra los datos de demostración</p></div><div class="table-tools"><label class="import-label" for="csv-file">Cargar CSV / Excel</label><input id="csv-file" type="file" accept=".csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" hidden><input class="search" id="table-search" type="search" placeholder="Buscar categoría o fecha..." aria-label="Buscar en registros"><button class="export" id="template-csv" type="button">Plantilla general ↓</button><button class="export" id="template-agro" type="button">Plantilla AgroData ↓</button><button class="export" id="export-csv" type="button">Exportar CSV ↓</button><button class="export" id="export-pdf" type="button">Informe PDF ↗</button></div></div><div class="table-scroll"><table><thead><tr><th>Fecha</th><th>Categoría</th><th>Descripción</th><th>Valor</th><th>Estado</th></tr></thead><tbody id="data-table"></tbody></table></div><p class="panel-sub" id="table-count" aria-live="polite"></p></section>
 <section class="panel stats-panel"><div class="panel-head"><div><h2>Resumen estadístico</h2><p class="panel-sub">Calculado sobre los valores numéricos del conjunto filtrado</p></div></div><div class="stats-grid"><article><span>Media</span><strong id="stat-mean">—</strong></article><article><span>Mediana</span><strong id="stat-median">—</strong></article><article><span>Desviación estándar</span><strong id="stat-sd">—</strong></article><article><span>Varianza muestral</span><strong id="stat-variance">—</strong></article><article><span>Coeficiente de variación</span><strong id="stat-cv">—</strong></article></div><p class="panel-sub" id="stats-note">Estadísticos calculados con los datos visibles del período.</p></section>
 <section class="panel agro-panel" aria-labelledby="agro-title">
 <div class="panel-head"><div><div class="eyebrow">MONTTECH · AGRODATA</div><h2 id="agro-title">Comparación de tratamientos agrícolas</h2><p class="panel-sub">Compara mediciones reales agrupadas por variable y tratamiento.</p></div><select class="select" id="agro-variable" aria-label="Seleccionar variable agrícola"><option value="all">Todas las variables</option></select></div>
@@ -349,22 +349,49 @@ body[data-theme="aurora"]{--cyan:#69f0c4;--blue:#4ba9ff;--accent:#a3f7cf}
     byId('import-preview-note').textContent='Vista previa de las primeras '+Math.min(5,pendingImport.rows.length)+' filas. Puedes cambiar la columna de valores si DataLab no la detectó bien.';
     workbench.hidden=false;workbench.scrollIntoView({behavior:'smooth',block:'start'});
   }
-  function confirmImport(){
+  let stagedImport=null;
+  function sameHeader(row,headers){return headers.every((h,i)=>String(row[i]??'').trim().toLowerCase()===String(h??'').trim().toLowerCase());}
+  function prepareRepair(){
     if(!pendingImport)return;
     const vi=Number(byId('map-value').value),di=Number(byId('map-date').value),ci=Number(byId('map-category').value),xi=Number(byId('map-description').value);
-    if(vi<0){alert('Selecciona la columna que contiene los números que deseas analizar.');return;}
-    const toDate=s=>{let v=String(s||'').trim(),m=v.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/);if(m)return new Date(+m[1],+m[2]-1,+m[3]);m=v.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})/);if(m)return new Date(+m[3],+m[2]-1,+m[1]);return new Date(v);};
-    const imported=pendingImport.rows.map((row,i)=>{const d=di>=0?toDate(row[di]):new Date();return {date:Number.isFinite(d.getTime())?d:new Date(),category:ci>=0?(row[ci]||'Sin categoría'):'Todos los datos',description:xi>=0?(row[xi]||'Registro '+(i+1)):'Registro '+(i+1),value:looseNumber(row[vi]),status:'Importado',treatment:ci>=0?row[ci]:'',variable:xi>=0?row[xi]:'',_source:row};}).filter(x=>Number.isFinite(x.value));
-    if(!imported.length){alert('No encontré números válidos en esa columna. Selecciona otra columna.');return;}
-    const skipped=pendingImport.rows.length-imported.length,fileName=pendingImport.fileName;
-    records.splice(0,records.length,...imported);categories=[...new Set(imported.map(x=>x.category))];
-    today.setTime(Math.max(...imported.map(x=>x.date.getTime())));days=0;category='all';search='';
+    if(vi<0){alert('Selecciona la columna que contiene los números.');return;}
+    const h=pendingImport.headers,rows=pendingImport.rows,seen=new Set();let duplicates=0,headers=0,missing=0,dates=0;
+    const items=rows.map((row,i)=>{
+      const key=row.map(v=>String(v??'').trim().toLowerCase()).join('\u001f');if(seen.has(key))duplicates++;seen.add(key);
+      if(sameHeader(row,h))headers++;
+      const value=looseNumber(row[vi]);if(!Number.isFinite(value))missing++;
+      let date=new Date();if(di>=0){const s=String(row[di]||'').trim();let m=s.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/);if(m)date=new Date(+m[1],+m[2]-1,+m[3]);else if((m=s.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})/)))date=new Date(+m[3],+m[2]-1,+m[1]);else date=new Date(s);}if(Number.isFinite(date.getTime()))dates++;
+      return {row,value,date:Number.isFinite(date.getTime())?date:new Date(),category:ci>=0?(row[ci]||'Sin categoría'):'Todos los datos',description:xi>=0?(row[xi]||'Registro '+(i+1)):'Registro '+(i+1),status:'Importado',treatment:ci>=0?row[ci]:'',variable:xi>=0?row[xi]:'',_source:row};
+    });
+    stagedImport={items,headers:h,duplicates,headersRepeated:headers,missing,dates,blankRows:pendingImport.blankRows||0,fileName:pendingImport.fileName};
+    byId('repair-blanks').textContent=number(stagedImport.blankRows);byId('repair-duplicates').textContent=number(duplicates);byId('repair-headers').textContent=number(headers);byId('repair-missing').textContent=number(missing);byId('repair-dates').textContent=number(dates);
+    byId('repair-summary').textContent='Se revisaron '+number(rows.length)+' filas. Elige qué deseas corregir.';
+    byId('repair-preview-note').textContent='Los valores faltantes nunca se rellenan inventando datos. Si los excluyes, no participan en los cálculos.';
+    workbench.hidden=true;byId('repair-workbench').hidden=false;byId('repair-workbench').scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  function finishRepair(clean){
+    if(!stagedImport)return;
+    const trim=clean&&byId('repair-trim').checked,dropDup=clean&&byId('repair-duplicates-toggle').checked,dropHeader=clean&&byId('repair-header-toggle').checked,dropMissing=clean&&byId('repair-missing-toggle').checked;
+    const seen=new Set();let dupRemoved=0,headerRemoved=0,missingRemoved=0;
+    const finalRows=[];
+    stagedImport.items.forEach(item=>{
+      const row=trim?item.row.map(v=>String(v??'').trim()):item.row;
+      if(dropHeader&&sameHeader(row,stagedImport.headers)){headerRemoved++;return;}
+      const key=row.map(v=>String(v??'').trim().toLowerCase()).join('\u001f');
+      if(dropDup&&seen.has(key)){dupRemoved++;return;}seen.add(key);
+      if(dropMissing&&!Number.isFinite(item.value)){missingRemoved++;return;}
+      finalRows.push({...item,row});
+    });
+    if(!finalRows.length){alert('No quedan valores numéricos para analizar. Cambia las opciones o revisa la columna seleccionada.');return;}
+    const fileName=stagedImport.fileName;
+    records.splice(0,records.length,...finalRows.map(({row,...record})=>record));categories=[...new Set(records.map(x=>x.category))];
+    today.setTime(Math.max(...records.map(x=>x.date.getTime())));days=0;category='all';search='';
     document.querySelectorAll('[data-range]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.range==='all')));
     byId('category-filter').value='all';byId('table-search').value='';render();
     byId('kpi-records-note').textContent='Archivo cargado: '+fileName;
-    byId('stats-note').textContent=number(imported.length)+' filas listas para analizar.'+(skipped?' Se omitieron '+number(skipped)+' filas sin número válido.':'');
-    byId('table-count').textContent=number(imported.length)+' registros importados correctamente.';
-    workbench.hidden=true;pendingImport=null;
+    byId('stats-note').textContent=number(records.length)+' filas listas. Limpieza: '+number(dupRemoved)+' duplicados, '+number(headerRemoved)+' encabezados repetidos y '+number(missingRemoved)+' valores faltantes excluidos.';
+    byId('table-count').textContent=number(records.length)+' registros importados y organizados.';
+    byId('repair-workbench').hidden=true;workbench.hidden=true;pendingImport=null;stagedImport=null;
   }
   const fileInput=byId('csv-file');
   if(fileInput)fileInput.addEventListener('change',async()=>{
@@ -378,18 +405,21 @@ body[data-theme="aurora"]{--cyan:#69f0c4;--blue:#4ba9ff;--accent:#a3f7cf}
         if(!sheet)throw new Error('El libro no contiene hojas.');matrix=window.XLSX.utils.sheet_to_json(sheet,{header:1,defval:'',raw:false});
       }else{const parsed=parseCSV(await file.text());matrix=[parsed.headers,...parsed.rawRows];}
       if(!matrix||matrix.length<2)throw new Error('No encuentro filas de datos.');
-      const headers=matrix[0].map((h,i)=>String(h||'Columna '+(i+1))),rows=matrix.slice(1).filter(row=>row.some(v=>String(v??'').trim()!=='')).map(row=>headers.map((_,i)=>String(row[i]??'').trim()));
+      const headers=matrix[0].map((h,i)=>String(h||'Columna '+(i+1))),allRows=matrix.slice(1),blankRows=allRows.filter(row=>!row.some(v=>String(v??'').trim()!=='')).length,rows=allRows.filter(row=>row.some(v=>String(v??'').trim()!=='')).map(row=>headers.map((_,i)=>String(row[i]??'').trim()));
       if(!rows.length)throw new Error('El archivo tiene encabezados, pero no contiene registros.');
       const norm=headers.map(normalizeHeader),detect=kind=>headers.findIndex((_,i)=>aliases[kind].some(a=>norm[i].includes(a)));
       let value=detect('value');if(value<0)value=headers.findIndex((_,i)=>rows.filter(row=>Number.isFinite(looseNumber(row[i]))).length>=Math.max(1,Math.ceil(rows.length*.5)));
-      pendingImport={headers,rows,fileName:file.name,indexes:{value,date:detect('date'),category:detect('category'),description:detect('description')}};
+      pendingImport={headers,rows,blankRows,fileName:file.name,indexes:{value,date:detect('date'),category:detect('category'),description:detect('description')}};
       showPreview(file);
       if(value<0)byId('import-preview-note').textContent='No detecté automáticamente los números. Selecciona manualmente la columna de valores.';
       else byId('map-value').value=String(value);
     }catch(err){alert('No pude leer el archivo. '+err.message+' Prueba con CSV UTF-8 o selecciona otra hoja de Excel.');}
     fileInput.value='';
   });
-  byId('import-confirm').addEventListener('click',confirmImport);
+  byId('import-confirm').addEventListener('click',prepareRepair);
+  byId('repair-apply').addEventListener('click',()=>finishRepair(true));
+  byId('repair-keep').addEventListener('click',()=>finishRepair(false));
+  byId('repair-back').addEventListener('click',()=>{byId('repair-workbench').hidden=true;workbench.hidden=false;workbench.scrollIntoView({behavior:'smooth',block:'start'});});
   byId('import-cancel').addEventListener('click',()=>{pendingImport=null;workbench.hidden=true;});
   const themePicker=byId('dashboard-theme'),allowedThemes=['aurora','ocean','lavender','sunrise'];
   let theme='aurora';try{theme=localStorage.getItem('monttech-theme')||'aurora';}catch(_){}
