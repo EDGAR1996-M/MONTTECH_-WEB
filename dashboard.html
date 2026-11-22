@@ -7,6 +7,8 @@
 <meta name="description" content="Dashboard interactivo de análisis de datos de demostración de MONTTECH.">
 <title>DataLab | MONTTECH</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -43,6 +45,12 @@ body[data-theme="aurora"]{--cyan:#69f0c4;--blue:#4ba9ff;--accent:#a3f7cf}
 #stats-note{margin-top:13px}
 @media(max-width:850px){.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:560px){.top-actions{flex-wrap:wrap;justify-content:flex-end}.stats-grid{gap:8px}.stats-grid article{padding:11px}}
+.attachment-list{display:grid;gap:8px;margin:12px 0 0;padding:0;list-style:none}
+.attachment-row{display:flex;align-items:center;gap:8px;min-width:0;padding:9px;border:1px solid var(--line);border-radius:9px;background:rgba(4,15,34,.5)}
+.attachment-name{flex:1;min-width:0;overflow-wrap:anywhere;color:var(--text);font-size:10px}
+.attachment-meta{color:var(--muted);font-size:9px;white-space:nowrap}
+.attachment-action{padding:6px 9px;border:1px solid var(--line);border-radius:7px;color:var(--cyan);background:#07162d;font-size:9px;cursor:pointer}
+@media(max-width:560px){.attachment-row{flex-wrap:wrap}.attachment-name{flex-basis:100%}}
 
 main.shell{max-width:1160px}
 header.page-head{flex-direction:column;align-items:center;text-align:center;padding:44px 0 28px}
@@ -91,6 +99,7 @@ header.page-head{flex-direction:column;align-items:center;text-align:center;padd
 <article class="panel"><div class="panel-head"><div><h2>Distribución por categoría</h2><p class="panel-sub">Participación dentro de la selección</p></div></div><div class="donut-area"><div class="donut" id="donut-chart" role="img" aria-label="Gráfico circular de categorías"><div class="donut-center"><strong id="donut-total">0</strong><small>registros</small></div></div><div class="legend-list" id="category-legend"></div></div></article>
 </section>
 <section class="panel" id="import-workbench" hidden style="margin-bottom:16px"><div class="panel-head"><div><div class="eyebrow">IMPORTACIÓN INTELIGENTE</div><h2>Revisa y organiza tu archivo</h2><p class="panel-sub" id="import-file-note">Selecciona qué columna corresponde a cada dato. No necesitas cambiar tu Excel.</p></div></div><label class="panel-sub" id="excel-sheet-wrap" hidden>Hoja de Excel<select class="select" id="excel-sheet-picker" style="display:block;width:100%;margin-top:7px"></select></label><div class="stats-grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))"><label class="panel-sub">Columna de valores *<select class="select" id="map-value" style="display:block;width:100%;margin-top:7px"></select></label><label class="panel-sub">Fecha (opcional)<select class="select" id="map-date" style="display:block;width:100%;margin-top:7px"></select></label><label class="panel-sub">Categoría / grupo<select class="select" id="map-category" style="display:block;width:100%;margin-top:7px"></select></label><label class="panel-sub">Descripción<select class="select" id="map-description" style="display:block;width:100%;margin-top:7px"></select></label></div><p class="panel-sub" id="import-preview-note" aria-live="polite" style="margin:14px 0 8px"></p><div class="table-scroll"><table><thead><tr id="import-preview-head"></tr></thead><tbody id="import-preview-body"></tbody></table></div><div class="filters" style="margin-top:14px"><button class="export" id="import-confirm" type="button">Usar estos datos</button><button class="filter-btn" id="import-cancel" type="button">Cancelar</button></div></section><section class="panel" id="repair-workbench" hidden style="margin-bottom:16px"><div class="panel-head"><div><div class="eyebrow">LIMPIEZA SEGURA</div><h2>Revisemos los datos</h2><p class="panel-sub" id="repair-summary">DataLab encontró detalles que puedes corregir.</p></div></div><div class="stats-grid" style="grid-template-columns:repeat(auto-fit,minmax(135px,1fr))"><article><span>Filas vacías</span><strong id="repair-blanks">0</strong></article><article><span>Duplicados</span><strong id="repair-duplicates">0</strong></article><article><span>Encabezados repetidos</span><strong id="repair-headers">0</strong></article><article><span>Valores faltantes</span><strong id="repair-missing">0</strong></article><article><span>Fechas reconocidas</span><strong id="repair-dates">0</strong></article></div><p class="panel-sub">Selecciona las correcciones. El archivo original nunca se modifica.</p><div class="filters" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px"><label><input type="checkbox" id="repair-trim" checked> Quitar espacios sobrantes</label><label><input type="checkbox" id="repair-duplicates-toggle" checked> Eliminar duplicados</label><label><input type="checkbox" id="repair-header-toggle" checked> Quitar encabezados repetidos</label><label><input type="checkbox" id="repair-missing-toggle" checked> Excluir valores faltantes</label></div><p class="panel-sub" id="repair-preview-note" aria-live="polite"></p><div class="filters" style="margin-top:12px"><button class="export" id="repair-apply" type="button">Aplicar limpieza y analizar</button><button class="filter-btn" id="repair-keep" type="button">Continuar sin limpiar</button><button class="filter-btn" id="repair-back" type="button">Volver</button></div></section><section class="panel table-panel"><div class="panel-head"><div><h2>Registros recientes</h2><p class="panel-sub">Consulta y filtra los datos de demostración</p></div><div class="table-tools"><div class="tool-group" role="group" aria-label="Buscar y cargar datos"><span class="tool-group-title">Datos</span><input class="search" id="table-search" type="search" placeholder="Buscar categoría o fecha..." aria-label="Buscar en registros"><label class="import-label" for="csv-file">Cargar CSV / Excel</label><input id="csv-file" type="file" accept=".csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" hidden></div><div class="tool-group" role="group" aria-label="Descargar plantillas"><span class="tool-group-title">Plantillas</span><button class="export" id="template-csv" type="button">Plantilla general ↓</button><button class="export" id="template-agro" type="button">Plantilla AgroData ↓</button></div><div class="tool-group" role="group" aria-label="Exportar información"><span class="tool-group-title">Exportar</span><button class="export" id="export-csv" type="button">Exportar CSV ↓</button><button class="export" id="export-pdf" type="button">Informe PDF ↗</button></div><div class="tool-group" role="group" aria-label="Proyectos guardados"><span class="tool-group-title">Proyecto</span><button class="export" id="save-project" type="button">Guardar proyecto</button><button class="export" id="load-project" type="button">Recuperar proyecto</button></div></div></div><div class="table-scroll"><table><thead><tr><th>Fecha</th><th>Categoría</th><th>Descripción</th><th>Valor</th><th>Estado</th><th>Acción</th></tr></thead><tbody id="data-table"></tbody></table></div><p class="panel-sub" id="table-count" aria-live="polite"></p></section>
+<section class="panel attachment-panel" aria-labelledby="attachments-title"><div class="panel-head"><div><h2 id="attachments-title">Archivos adjuntos</h2><p class="panel-sub">Puedes guardar PDF, Word y otros archivos junto a tu proyecto. Se conservan en este navegador.</p></div><label class="import-label" for="attachment-files">Agregar archivos</label><input id="attachment-files" type="file" multiple hidden></div><p class="panel-sub" id="attachment-status" role="status" aria-live="polite">Aún no hay archivos adjuntos.</p><ul class="attachment-list" id="attachment-list"></ul></section>
 <section class="panel stats-panel"><div class="panel-head"><div><h2>Resumen estadístico</h2><p class="panel-sub">Calculado sobre los valores numéricos del conjunto filtrado</p></div></div><div class="stats-grid"><article><span>Media</span><strong id="stat-mean">—</strong></article><article><span>Mediana</span><strong id="stat-median">—</strong></article><article><span>Desviación estándar</span><strong id="stat-sd">—</strong></article><article><span>Varianza muestral</span><strong id="stat-variance">—</strong></article><article><span>Coeficiente de variación</span><strong id="stat-cv">—</strong></article></div><p class="panel-sub" id="stats-note">Estadísticos calculados con los datos visibles del período.</p></section>
 <section class="panel agro-panel" aria-labelledby="agro-title">
 <div class="panel-head"><div><div class="eyebrow">MONTTECH · AGRODATA</div><h2 id="agro-title">Comparación de tratamientos agrícolas</h2><p class="panel-sub">Compara mediciones reales agrupadas por variable y tratamiento.</p></div><select class="select" id="agro-variable" aria-label="Seleccionar variable agrícola"><option value="all">Todas las variables</option></select></div>
@@ -98,7 +107,7 @@ header.page-head{flex-direction:column;align-items:center;text-align:center;padd
 <div class="agro-table-wrap"><table class="agro-table"><thead><tr><th>Variable</th><th>Tratamiento</th><th>n</th><th>Media</th><th>Desv. estándar</th><th>CV (%)</th></tr></thead><tbody id="agro-table"><tr><td colspan="6" class="empty">Aún no hay mediciones agrícolas importadas.</td></tr></tbody></table></div>
 <p class="panel-sub" id="agro-note">Se mostrarán estadísticas descriptivas por tratamiento. No se generan conclusiones causales automáticamente.</p>
 </section>
-<p class="footnote"><strong>Nota:</strong> los datos iniciales son ficticios. Puedes cargar archivos CSV o Excel (.xlsx/.xls); el archivo se procesa localmente en tu navegador y no se envía a un servidor. Para AgroData usa la plantilla específica con columnas de cultivo, variedad, tratamiento, variable, unidad y repetición. Los resultados son descriptivos; no sustituyen un análisis inferencial.</p>
+<p class="footnote"><strong>Nota:</strong> los datos iniciales son ficticios. Puedes analizar CSV, Excel, PDF, Word (.docx), TXT, TSV o JSON; la extracción se realiza localmente en tu navegador. Otros formatos pueden adjuntarse al proyecto. Para AgroData usa la plantilla específica con columnas de cultivo, variedad, tratamiento, variable, unidad y repetición. Los resultados son descriptivos; no sustituyen un análisis inferencial.</p>
 </main>
 <footer class="shell">MONTTECH · Tecnología y soluciones inteligentes · DataLab demostrativo</footer>
 <script>
@@ -237,68 +246,10 @@ header.page-head{flex-direction:column;align-items:center;text-align:center;padd
     if(quoted)throw new Error('Hay comillas sin cerrar. Abre el archivo y revisa la fila indicada.');
     if(rows.length<2)throw new Error('No encuentro una tabla con encabezados y filas de datos.');
     const width=Math.max(...rows.map(r=>r.length));
-    const norm=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
-    const headers=rows[0].map((h,i)=>norm(h)||('columna'+(i+1)));
+    const headers=Array.from({length:width},(_,i)=>String(rows[0][i]||'').trim()||('Columna '+(i+1)));
     const data=rows.slice(1).filter(r=>r.some(v=>String(v||'').trim())).map(r=>Array.from({length:width},(_,i)=>(r[i]||'').trim()));
     if(!data.length)throw new Error('La tabla tiene encabezados, pero no contiene filas con información.');
-    const find=aliases=>headers.findIndex(h=>aliases.some(a=>h===a||h.includes(a)));
-    const parseNumber=s=>{
-      let v=String(s??'').trim().replace(/[^\d,.-]/g,'');
-      if(!v||v==='-'||v==='.')return NaN;
-      if(v.includes(',')&&v.includes('.'))v=v.lastIndexOf(',')>v.lastIndexOf('.')?v.replace(/\./g,'').replace(',','.'):v.replace(/,/g,'');
-      else if(v.includes(',')){const parts=v.split(',');v=parts.length===2&&parts[1].length<=2?parts[0]+'.'+parts[1]:parts.join('');}
-      else if((v.match(/\./g)||[]).length>1)v=v.replace(/\./g,'');
-      return Number(v);
-    };
-    const parseDate=s=>{
-      const v=String(s||'').trim();
-      let m=v.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/);
-      if(m)return new Date(+m[1],+m[2]-1,+m[3]);
-      m=v.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})/);
-      if(m)return new Date(+m[3],+m[2]-1,+m[1]);
-      const d=new Date(v);return d;
-    };
-    let dateIx=find(['fecha','date','dia','timestamp','createdat']);
-    if(dateIx<0)dateIx=headers.findIndex((_,i)=>data.filter(r=>Number.isFinite(parseDate(r[i]).getTime())).length>=Math.max(2,Math.ceil(data.length*.65)));
-    let valueIx=find(['valor','value','monto','amount','total','precio','price','cantidad','quantity','medicion','measurement','resultado','result']);
-    if(valueIx<0)valueIx=headers.findIndex((_,i)=>data.filter(r=>Number.isFinite(parseNumber(r[i]))).length>=Math.max(2,Math.ceil(data.length*.6)));
-    const categoryIx=find(['categoria','category','grupo','group','tipo','type','tratamiento','treatment','sustrato','variedad','variety','cultivo','crop']);
-    const descriptionIx=find(['descripcion','description','detalle','detail','nombre','name','producto','product','concepto']);
-    const treatmentIx=find(['tratamiento','treatment','sustrato']);
-    const variableIx=find(['variable','indicador','measurement','parametro','parameter']);
-    const unitIx=find(['unidad','unit']);
-    const cropIx=find(['cultivo','crop']);
-    const varietyIx=find(['variedad','variety']);
-    const replicateIx=find(['repeticion','replica','replicate','muestra','sample']);
-    const statusIx=find(['estado','status']);
-    const ignored=new Set([dateIx,valueIx,categoryIx,descriptionIx,statusIx,treatmentIx,variableIx,unitIx,cropIx,varietyIx,replicateIx].filter(i=>i>=0));
-    const otherText=headers.map((_,i)=>i).filter(i=>!ignored.has(i));
-    const fallbackDate=new Date();
-    const result=data.map((r,i)=>{
-      const parsedDate=dateIx>=0?parseDate(r[dateIx]):fallbackDate;
-      const validDate=Number.isFinite(parsedDate.getTime())?parsedDate:fallbackDate;
-      const parsedValue=valueIx>=0?parseNumber(r[valueIx]):NaN;
-      const treatment=treatmentIx>=0?r[treatmentIx]:(categoryIx>=0?r[categoryIx]:'');
-      const category=categoryIx>=0?r[categoryIx]:(treatment||'Datos');
-      const description=descriptionIx>=0?r[descriptionIx]:otherText.map(ix=>headers[ix]+': '+r[ix]).filter(x=>!x.endsWith(': ')).join(' · ')||('Registro '+(i+1));
-      return {
-        date:new Date(validDate.getFullYear(),validDate.getMonth(),validDate.getDate()),
-        category:category||'Sin categoría',
-        description:description||('Registro '+(i+1)),
-        value:Number.isFinite(parsedValue)?parsedValue:0,
-        status:statusIx>=0?(r[statusIx]||'Importado'):'Importado',
-        treatment,variable:variableIx>=0?r[variableIx]:'',
-        unit:unitIx>=0?r[unitIx]:'',crop:cropIx>=0?r[cropIx]:'',
-        variety:varietyIx>=0?r[varietyIx]:'',
-        replicate:replicateIx>=0?r[replicateIx]:'',
-        _source:r
-      };
-    });
-    if(valueIx<0)throw new Error('Pude leer las filas, pero no encontré una columna numérica. Revisa que haya números (por ejemplo 1250 o 12,5) y vuelve a cargar el archivo.');
-    const validRows=result.filter(r=>Number.isFinite(r.value));
-    validRows.skippedRows=result.length-validRows.length;
-    if(!validRows.length)throw new Error('Encontré las filas, pero ninguna tiene un valor numérico que pueda analizar.');
-    return validRows;
+    return [headers,...data];
   }
   function render() {
     filtered=selectedRecords();
@@ -355,7 +306,8 @@ header.page-head{flex-direction:column;align-items:center;text-align:center;padd
   function fillMap(id,headers,selected){const el=byId(id);el.innerHTML='<option value="-1">No usar</option>'+headers.map((h,i)=>'<option value="'+i+'">'+escapeHTML(h)+'</option>').join('');el.value=String(selected);}
   function showPreview(file){
     const h=pendingImport.headers,ix=pendingImport.indexes;
-    byId('import-file-note').textContent=file.name+' · '+pendingImport.rows.length+' filas detectadas. Revisa las columnas antes de importar.';
+    const rowCount=pendingImport.rows.length;
+    byId('import-file-note').textContent=file.name+' · '+rowCount+(rowCount===1?' fila detectada.':' filas detectadas.')+' Revisa las columnas antes de importar.';
     fillMap('map-value',h,ix.value);fillMap('map-date',h,ix.date);fillMap('map-category',h,ix.category);fillMap('map-description',h,ix.description);
     byId('import-preview-head').innerHTML=h.map(x=>'<th>'+escapeHTML(x)+'</th>').join('');
     byId('import-preview-body').innerHTML=pendingImport.rows.slice(0,5).map(row=>'<tr>'+h.map((_,i)=>'<td>'+escapeHTML(row[i]||'')+'</td>').join('')+'</tr>').join('');
@@ -407,6 +359,63 @@ header.page-head{flex-direction:column;align-items:center;text-align:center;padd
     byId('repair-workbench').hidden=true;workbench.hidden=true;pendingImport=null;stagedImport=null;
   }
   const fileInput=byId('csv-file');
+  fileInput.accept='.csv,.tsv,.txt,.json,.xlsx,.xls,.pdf,.docx';
+  const importLabel=document.querySelector('label[for="csv-file"]');
+  if(importLabel)importLabel.textContent='Importar datos';
+  const attachmentInput=byId('attachment-files'),attachmentList=byId('attachment-list'),attachmentStatus=byId('attachment-status');
+  const attachmentDB=new Promise((resolve,reject)=>{
+    if(!window.indexedDB){reject(new Error('Este navegador no permite guardar adjuntos localmente.'));return;}
+    const request=window.indexedDB.open('monttech-datalab-attachments',1);
+    request.onupgradeneeded=()=>{if(!request.result.objectStoreNames.contains('files'))request.result.createObjectStore('files',{keyPath:'id'});};
+    request.onsuccess=()=>resolve(request.result);
+    request.onerror=()=>reject(request.error||new Error('No se pudo abrir el almacenamiento de adjuntos.'));
+  });
+  function withAttachmentStore(mode,makeRequest){
+    return attachmentDB.then(db=>new Promise((resolve,reject)=>{
+      const transaction=db.transaction('files',mode),request=makeRequest(transaction.objectStore('files'));
+      let result;
+      request.onsuccess=()=>{result=request.result;};
+      request.onerror=()=>reject(request.error||new Error('No se pudo completar la operación del archivo.'));
+      transaction.oncomplete=()=>resolve(result);
+      transaction.onerror=()=>reject(transaction.error||new Error('No se pudo guardar el archivo.'));
+      transaction.onabort=()=>reject(transaction.error||new Error('Se canceló el almacenamiento del archivo.'));
+    }));
+  }
+  function fileSize(bytes){return bytes<1024*1024?(bytes/1024).toFixed(1)+' KB':(bytes/1024/1024).toFixed(1)+' MB';}
+  function renderAttachments(files){
+    attachmentStatus.textContent=files.length?files.length+' archivo(s) guardado(s) en este navegador.':'Aún no hay archivos adjuntos.';
+    attachmentList.innerHTML=files.map(file=>'<li class="attachment-row"><span class="attachment-name">'+escapeHTML(file.name)+'</span><span class="attachment-meta">'+fileSize(file.size)+'</span><button class="attachment-action" type="button" data-attachment-action="download" data-attachment-id="'+escapeHTML(file.id)+'">Descargar</button><button class="attachment-action" type="button" data-attachment-action="remove" data-attachment-id="'+escapeHTML(file.id)+'">Quitar</button></li>').join('');
+  }
+  async function refreshAttachments(){renderAttachments(await withAttachmentStore('readonly',store=>store.getAll()));}
+  refreshAttachments().catch(error=>{attachmentStatus.textContent='No se pudieron cargar los adjuntos: '+error.message;});
+  attachmentInput.addEventListener('change',async()=>{
+    const files=[...attachmentInput.files];
+    for(const file of files){
+      if(file.size>20*1024*1024){alert(file.name+' supera 20 MB y no se adjuntó.');continue;}
+      try{
+        const id=window.crypto&&crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+'-'+Math.random().toString(36).slice(2);
+        await withAttachmentStore('readwrite',store=>store.put({id,name:file.name,type:file.type,size:file.size,blob:file,addedAt:new Date().toISOString()}));
+      }catch(error){alert('No pude adjuntar '+file.name+': '+error.message);}
+    }
+    attachmentInput.value='';
+    try{await refreshAttachments();}catch(error){attachmentStatus.textContent='No se pudieron actualizar los adjuntos: '+error.message;}
+  });
+  attachmentList.addEventListener('click',async event=>{
+    const button=event.target.closest('[data-attachment-action]');
+    if(!button)return;
+    try{
+      const action=button.dataset.attachmentAction,id=button.dataset.attachmentId;
+      if(action==='remove'){
+        await withAttachmentStore('readwrite',store=>store.delete(id));
+        await refreshAttachments();
+        return;
+      }
+      const file=await withAttachmentStore('readonly',store=>store.get(id));
+      if(!file)throw new Error('El archivo ya no está disponible.');
+      const url=URL.createObjectURL(file.blob),link=document.createElement('a');
+      link.href=url;link.download=file.name;link.click();setTimeout(()=>URL.revokeObjectURL(url),60000);
+    }catch(error){alert('No pude gestionar el adjunto: '+error.message);}
+  });
   let activeWorkbook=null,activeExcelFile=null;
   function prepareSheetMatrix(matrix,file){
     if(!matrix||matrix.length<2)throw new Error('La hoja seleccionada no contiene encabezados y filas de datos.');
@@ -421,6 +430,68 @@ header.page-head{flex-direction:column;align-items:center;text-align:center;padd
     showPreview(file);
     if(value<0)byId('import-preview-note').textContent='No detecté automáticamente los números. Selecciona manualmente la columna de valores.';
     else byId('map-value').value=String(value);
+  }
+  function parseJSONMatrix(source){
+    let parsed;
+    try{parsed=JSON.parse(String(source||'').replace(/^\uFEFF/,''));}catch(_){throw new Error('El archivo JSON no tiene un formato válido.');}
+    if(parsed&&Array.isArray(parsed.headers)&&Array.isArray(parsed.rows)){
+      return [parsed.headers,...parsed.rows.map(row=>Array.isArray(row)?row:parsed.headers.map(header=>row?.[header]??''))];
+    }
+    const data=Array.isArray(parsed)?parsed:(parsed&&Array.isArray(parsed.data)?parsed.data:null);
+    if(data){
+      if(!data.length)throw new Error('El archivo JSON no contiene registros.');
+      if(Array.isArray(data[0]))return data;
+      if(data[0]&&typeof data[0]==='object'){
+        const headers=[...new Set(data.flatMap(row=>Object.keys(row)))];
+        return [headers,...data.map(row=>headers.map(header=>typeof row[header]==='object'&&row[header]!==null?JSON.stringify(row[header]):row[header]??''))];
+      }
+      return [['Valor'],...data.map(value=>[value])];
+    }
+    if(parsed&&typeof parsed==='object'){
+      return [['Campo','Valor'],...Object.entries(parsed).map(([key,value])=>[key,typeof value==='object'&&value!==null?JSON.stringify(value):value])];
+    }
+    throw new Error('El JSON debe contener una lista de registros o un objeto con datos.');
+  }
+  async function parsePDFMatrix(file){
+    if(!window.pdfjsLib)throw new Error('No se pudo cargar el lector PDF. Revisa tu conexión o adjunta el archivo sin analizarlo.');
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    const pdf=await window.pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise;
+    const matrix=[];
+    for(let pageNumber=1;pageNumber<=pdf.numPages;pageNumber++){
+      const page=await pdf.getPage(pageNumber),content=await page.getTextContent();
+      const items=content.items.filter(item=>typeof item.str==='string'&&item.str.trim()).map(item=>({text:item.str.trim(),x:item.transform[4],y:item.transform[5],width:item.width||0,height:item.height||10}));
+      const lines=[];
+      items.sort((a,b)=>b.y-a.y||a.x-b.x).forEach(item=>{
+        let line=lines.find(candidate=>Math.abs(candidate.y-item.y)<=3);
+        if(!line){line={y:item.y,items:[]};lines.push(line);}
+        line.items.push(item);
+      });
+      lines.sort((a,b)=>b.y-a.y).forEach(line=>{
+        const cells=[];
+        let previous=null;
+        line.items.sort((a,b)=>a.x-b.x).forEach(item=>{
+          const gap=previous?item.x-(previous.x+previous.width):0;
+          if(!cells.length||gap>Math.max(12,item.height*1.5))cells.push(item.text);
+          else cells[cells.length-1]+=' '+item.text;
+          previous=item;
+        });
+        if(cells.length)matrix.push(cells);
+      });
+    }
+    if(matrix.length<2)throw new Error('El PDF no contiene una tabla de texto reconocible. Si es un escaneo, adjúntalo o conviértelo primero a texto/CSV.');
+    return matrix;
+  }
+  async function parseWordMatrix(file){
+    if(!window.mammoth)throw new Error('No se pudo cargar el lector Word. Revisa tu conexión o adjunta el archivo sin analizarlo.');
+    const arrayBuffer=await file.arrayBuffer();
+    const converted=await window.mammoth.convertToHtml({arrayBuffer});
+    const documentHTML=new DOMParser().parseFromString(converted.value,'text/html');
+    const tableRows=[...documentHTML.querySelectorAll('table tr')].map(row=>[...row.querySelectorAll('th,td')].map(cell=>cell.textContent.trim())).filter(row=>row.some(Boolean));
+    if(tableRows.length>1)return tableRows;
+    const extracted=await window.mammoth.extractRawText({arrayBuffer});
+    const lines=extracted.value.split(/\r?\n/).map(line=>line.trim()).filter(Boolean);
+    if(!lines.length)throw new Error('El documento Word no contiene texto que se pueda extraer.');
+    return [['Contenido'],...lines.map(line=>[line])];
   }
   function showExcelSheet(name){
     if(!activeWorkbook||!activeExcelFile)return;
@@ -445,12 +516,26 @@ header.page-head{flex-direction:column;align-items:center;text-align:center;padd
         byId('excel-sheet-wrap').hidden=names.length<2;
         picker.value=names[0];
         showExcelSheet(names[0]);
-      }else{
+      }else if(ext==='csv'||ext==='tsv'||ext==='txt'){
         activeWorkbook=null;activeExcelFile=null;byId('excel-sheet-wrap').hidden=true;
-        const parsed=parseCSV(await file.text());
-        prepareSheetMatrix([parsed.headers,...parsed.rawRows],file);
+        prepareSheetMatrix(parseCSV(await file.text()),file);
+      }else if(ext==='json'){
+        activeWorkbook=null;activeExcelFile=null;byId('excel-sheet-wrap').hidden=true;
+        prepareSheetMatrix(parseJSONMatrix(await file.text()),file);
+      }else if(ext==='pdf'){
+        activeWorkbook=null;activeExcelFile=null;byId('excel-sheet-wrap').hidden=true;
+        prepareSheetMatrix(await parsePDFMatrix(file),file);
+        byId('import-preview-note').textContent='Texto y columnas aproximadas extraídos del PDF. Revisa la vista previa y corrige el mapeo antes de analizar.';
+      }else if(ext==='docx'){
+        activeWorkbook=null;activeExcelFile=null;byId('excel-sheet-wrap').hidden=true;
+        prepareSheetMatrix(await parseWordMatrix(file),file);
+        byId('import-preview-note').textContent='Contenido extraído del documento Word. Revisa la vista previa y elige una columna numérica para analizar.';
+      }else if(ext==='doc'){
+        throw new Error('El formato Word antiguo (.doc) no se puede analizar. Adjunta el archivo o guárdalo como .docx.');
+      }else{
+        throw new Error('Este formato no se puede analizar como tabla. Puedes guardarlo en Archivos adjuntos.');
       }
-    }catch(err){activeWorkbook=null;activeExcelFile=null;byId('excel-sheet-wrap').hidden=true;alert('No pude leer el archivo. '+err.message+' Prueba con CSV UTF-8 o revisa la hoja seleccionada.');}
+    }catch(err){activeWorkbook=null;activeExcelFile=null;byId('excel-sheet-wrap').hidden=true;alert('No pude leer '+file.name+': '+err.message+' Puedes adjuntarlo sin analizar desde Archivos adjuntos.');}
     fileInput.value='';
   });
   byId('excel-sheet-picker').addEventListener('change',()=>{
