@@ -203,11 +203,14 @@ if ('IntersectionObserver' in window && navigationLinks.length && observedSectio
 const whatsappForm = document.getElementById('whatsapp-form');
 
 if (whatsappForm) {
-  whatsappForm.addEventListener('submit', event => {
+  whatsappForm.addEventListener('submit', async event => {
     event.preventDefault();
 
     if (!whatsappForm.reportValidity()) return;
 
+    const submitButton = whatsappForm.querySelector('button[type="submit"]');
+    const feedback = document.getElementById('form-feedback');
+    submitButton.disabled = true;
     const formData = new FormData(whatsappForm);
     const name = String(formData.get('name') || '').trim();
     const email = String(formData.get('email') || '').trim();
@@ -224,13 +227,48 @@ if (whatsappForm) {
     ].filter(Boolean).join('\n');
 
     const whatsappUrl = 'https://wa.me/573137250239?text=' + encodeURIComponent(whatsappMessage);
-    const feedback = document.getElementById('form-feedback');
+    const whatsappTab = window.open('about:blank', '_blank');
+    if (whatsappTab) whatsappTab.opener = null;
 
     if (feedback) {
-      feedback.textContent = 'Se abrirá WhatsApp en una nueva pestaña. Revisa el mensaje antes de enviarlo.';
+      feedback.textContent = 'Registrando tu solicitud...';
     }
 
-    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+    try {
+      const csrfResponse = await fetch('/api/csrf', { credentials: 'same-origin' });
+      const csrfData = await csrfResponse.json().catch(() => ({}));
+      if (!csrfResponse.ok) throw new Error(csrfData.error || 'No pudimos iniciar una sesión segura.');
+
+      const requestResponse = await fetch('/api/public/requests', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrfData.token
+        },
+        body: JSON.stringify({ name, email, service, message })
+      });
+      const requestData = await requestResponse.json().catch(() => ({}));
+      if (!requestResponse.ok) throw new Error(requestData.error || 'No pudimos registrar tu solicitud.');
+
+      if (feedback) feedback.textContent = 'Solicitud registrada. Revisa el mensaje antes de enviarlo por WhatsApp.';
+      if (whatsappTab) whatsappTab.location.replace(whatsappUrl);
+      else window.location.assign(whatsappUrl);
+      whatsappForm.reset();
+    } catch (error) {
+      if (whatsappTab && !whatsappTab.closed) whatsappTab.close();
+      if (feedback) {
+        feedback.textContent = 'No pudimos guardar tu solicitud: ' + error.message + ' Puedes continuar por WhatsApp de todas formas: ';
+        const fallbackLink = document.createElement('a');
+        fallbackLink.href = whatsappUrl;
+        fallbackLink.target = '_blank';
+        fallbackLink.rel = 'noopener noreferrer';
+        fallbackLink.textContent = 'abrir WhatsApp';
+        feedback.appendChild(fallbackLink);
+      }
+    } finally {
+      submitButton.disabled = false;
+    }
   });
 }
 

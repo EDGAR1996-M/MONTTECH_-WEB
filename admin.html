@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07111f">
+  <title>Administración | MONTTECH</title>
+  <link rel="stylesheet" href="admin.css">
+  <script src="admin.js" defer></script>
+</head>
+<body>
+  <div class="page-glow" aria-hidden="true"></div>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="MONTTECH, volver al sitio">
+      <span class="brand-mark">M</span>
+      <span>MONT<span>TECH</span><small>PLATAFORMA ADMINISTRATIVA</small></span>
+    </a>
+    <a class="back-link" href="/">Volver al sitio ↗</a>
+  </header>
+
+  <main class="shell">
+    <section class="login-card" id="login-view" aria-labelledby="login-title">
+      <div class="eyebrow">ACCESO RESTRINGIDO</div>
+      <h1 id="login-title">Panel administrativo</h1>
+      <p>Inicia sesión para gestionar clientes, proyectos y solicitudes.</p>
+      <form id="login-form">
+        <label for="login-email">Correo electrónico</label>
+        <input id="login-email" name="email" type="email" autocomplete="username" maxlength="254" required>
+        <label for="login-password">Contraseña</label>
+        <input id="login-password" name="password" type="password" autocomplete="current-password" maxlength="128" required>
+        <button class="button primary" type="submit">Iniciar sesión</button>
+      </form>
+      <p class="message" id="login-message" role="status" aria-live="polite"></p>
+    </section>
+
+    <section id="admin-view" hidden>
+      <div class="welcome">
+        <div>
+          <div class="eyebrow">GESTIÓN MONTTECH</div>
+          <h1>Panel de control</h1>
+          <p>Administra clientes, proyectos y solicitudes desde un solo lugar.</p>
+        </div>
+        <div class="account">
+          <span id="admin-email"></span>
+          <button class="button secondary" id="logout-button" type="button">Cerrar sesión</button>
+        </div>
+      </div>
+      <p class="message app-message" id="app-message" role="status" aria-live="polite"></p>
+
+      <nav class="tabs" aria-label="Secciones administrativas">
+        <button class="tab active" type="button" data-tab="overview">Resumen</button>
+        <button class="tab" type="button" data-tab="clients">Clientes</button>
+        <button class="tab" type="button" data-tab="projects">Proyectos</button>
+        <button class="tab" type="button" data-tab="requests">Solicitudes</button>
+        <button class="tab" type="button" data-tab="reports">Reportes</button>
+      </nav>
+
+      <section class="tab-panel" id="panel-overview">
+        <div class="stats-grid">
+          <article class="stat-card"><span>Clientes</span><strong id="stat-clients">0</strong></article>
+          <article class="stat-card"><span>Proyectos</span><strong id="stat-projects">0</strong></article>
+          <article class="stat-card"><span>Solicitudes</span><strong id="stat-requests">0</strong></article>
+          <article class="stat-card highlight"><span>Solicitudes nuevas</span><strong id="stat-new-requests">0</strong></article>
+        </div>
+        <article class="content-card">
+          <div class="section-heading">
+            <div><div class="eyebrow">ACTIVIDAD RECIENTE</div><h2>Últimas solicitudes</h2></div>
+            <button class="button secondary" type="button" data-open-tab="requests">Ver solicitudes</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Cliente</th><th>Servicio</th><th>Fecha</th><th>Estado</th></tr></thead>
+              <tbody id="recent-requests"></tbody>
+            </table>
+            <p class="empty-state" id="recent-empty" hidden>No hay solicitudes registradas todavía.</p>
+          </div>
+        </article>
+      </section>
+
+      <section class="tab-panel" id="panel-clients" hidden>
+        <div class="section-heading"><div><div class="eyebrow">RELACIONES</div><h2>Clientes</h2></div></div>
+        <div class="management-grid">
+          <form class="content-card record-form" id="client-form">
+            <h3 id="client-form-title">Agregar cliente</h3>
+            <input id="client-id" type="hidden">
+            <label for="client-name">Nombre *</label><input id="client-name" name="name" required maxlength="100">
+            <label for="client-email">Correo electrónico</label><input id="client-email" name="email" type="email" maxlength="254">
+            <label for="client-phone">Teléfono</label><input id="client-phone" name="phone" type="tel" maxlength="40">
+            <label for="client-company">Empresa</label><input id="client-company" name="company" maxlength="120">
+            <label for="client-notes">Notas</label><textarea id="client-notes" name="notes" rows="3" maxlength="2000"></textarea>
+            <div class="form-actions"><button class="button primary" type="submit">Guardar cliente</button><button class="button secondary" id="client-cancel" type="button" hidden>Cancelar</button></div>
+          </form>
+          <article class="content-card list-card">
+            <div class="list-heading"><h3>Directorio</h3><input id="client-search" type="search" placeholder="Buscar cliente" aria-label="Buscar cliente"></div>
+            <div class="table-wrap">
+              <table><thead><tr><th>Nombre</th><th>Contacto</th><th>Empresa</th><th>Acciones</th></tr></thead><tbody id="clients-list"></tbody></table>
+              <p class="empty-state" id="clients-empty" hidden>No hay clientes para mostrar.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="tab-panel" id="panel-projects" hidden>
+        <div class="section-heading"><div><div class="eyebrow">PORTAFOLIO Y SEGUIMIENTO</div><h2>Proyectos</h2></div></div>
+        <div class="management-grid">
+          <form class="content-card record-form" id="project-form">
+            <h3 id="project-form-title">Agregar proyecto</h3>
+            <input id="project-id" type="hidden">
+            <label for="project-name">Nombre *</label><input id="project-name" name="name" required maxlength="120">
+            <label for="project-client">Cliente asociado</label><select id="project-client" name="clientId"><option value="">Sin cliente asociado</option></select>
+            <label for="project-description">Descripción</label><textarea id="project-description" name="description" rows="3" maxlength="5000"></textarea>
+            <label for="project-technologies">Tecnologías <span>(separadas por coma)</span></label><input id="project-technologies" name="technologies" maxlength="500" placeholder="HTML, JavaScript, PostgreSQL">
+            <label for="project-status">Estado</label>
+            <select id="project-status" name="status">
+              <option value="planned">Planeado</option><option value="in_progress">En progreso</option><option value="completed">Completado</option><option value="paused">En pausa</option>
+            </select>
+            <div class="form-actions"><button class="button primary" type="submit">Guardar proyecto</button><button class="button secondary" id="project-cancel" type="button" hidden>Cancelar</button></div>
+          </form>
+          <article class="content-card list-card">
+            <div class="list-heading"><h3>Proyectos registrados</h3></div>
+            <div class="table-wrap">
+              <table><thead><tr><th>Proyecto</th><th>Cliente</th><th>Estado</th><th>Tecnologías</th><th>Acciones</th></tr></thead><tbody id="projects-list"></tbody></table>
+              <p class="empty-state" id="projects-empty" hidden>No hay proyectos para mostrar.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="tab-panel" id="panel-requests" hidden>
+        <div class="section-heading"><div><div class="eyebrow">NUEVOS CONTACTOS</div><h2>Solicitudes</h2></div></div>
+        <article class="content-card">
+          <div class="list-heading">
+            <p class="muted">Actualiza el estado para dar seguimiento a cada contacto.</p>
+            <input id="request-search" type="search" placeholder="Buscar solicitudes" aria-label="Buscar solicitudes">
+          </div>
+          <div class="table-wrap">
+            <table><thead><tr><th>Cliente y mensaje</th><th>Servicio</th><th>Fecha</th><th>Estado</th><th>Acción</th></tr></thead><tbody id="requests-list"></tbody></table>
+            <p class="empty-state" id="requests-empty" hidden>No hay solicitudes para mostrar.</p>
+          </div>
+        </article>
+      </section>
+
+      <section class="tab-panel" id="panel-reports" hidden>
+        <div class="section-heading"><div><div class="eyebrow">INFORMACIÓN DEL NEGOCIO</div><h2>Reportes</h2></div></div>
+        <article class="content-card report-card">
+          <div class="report-icon" aria-hidden="true">↓</div>
+          <div><h3>Exportar informe administrativo</h3><p>Descarga clientes, proyectos y solicitudes en un archivo CSV compatible con Excel.</p></div>
+          <button class="button primary" id="download-report" type="button">Descargar CSV</button>
+        </article>
+      </section>
+    </section>
+  </main>
+  <footer><span>MONTTECH · Plataforma administrativa</span><a href="/">Volver al sitio</a></footer>
+</body>
+</html>

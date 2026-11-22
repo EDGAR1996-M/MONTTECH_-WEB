@@ -372,5 +372,6 @@ main>section:not(.hero)::before{position:absolute;z-index:-1;inset:8% -4vw;borde
 .roadmap-card ul{display:grid;gap:10px;margin:0;padding:0;list-style:none}
 .roadmap-card li{position:relative;padding-left:17px;color:#d4e2f3;font-size:11px;line-height:1.55}
 .roadmap-card li:before{position:absolute;left:0;color:var(--cyan);font-weight:800;content:"✓"}
+.roadmap-link{display:inline-flex;align-items:center;gap:7px;margin-top:18px;color:var(--cyan);font-size:12px;font-weight:700;text-decoration:none}.roadmap-link:hover{text-decoration:underline}
 @media(max-width:900px){.roadmap-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.roadmap-card:last-child{grid-column:1/-1}}
 @media(max-width:680px){.roadmap{padding:48px 0}.roadmap-grid{grid-template-columns:1fr;gap:12px}.roadmap-card{padding:20px}.roadmap-card:last-child{grid-column:auto}.roadmap-card h3{font-size:17px}}
